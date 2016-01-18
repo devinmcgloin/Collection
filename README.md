@@ -12,8 +12,8 @@ I would like to make all collections immutable, but the focus is on having half 
 
 ## Collections
 
-- Collections (Lists, Priority Queues, Arrays)
-- Sets
+- Collections (Lists, Priority Queues, Arrays, AVL Trees)
+- Sets (This is primarily its own category due to no easy way to do set indexing)
 - Maps
 
 ## Operations
@@ -30,4 +30,3 @@ I would like to make all collections immutable, but the focus is on having half 
 
 - Search
 - Group By
-- 
