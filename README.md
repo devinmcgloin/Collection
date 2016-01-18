@@ -27,6 +27,5 @@ I would like to make all collections immutable, but the focus is on having half 
 - get
 - membership
 - subset
-
 - Search
 - Group By
