@@ -5,5 +5,6 @@ package funct;
  * Takes an item of type E and gets a certain item from it.
  * Used for grouping
  */
-public class Getter<E> {
+public interface Getter<E, T> {
+
 }
