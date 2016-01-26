@@ -7,5 +7,4 @@ import seq.Seq;
  */
 public class Array<E> extends Seq<E> {
 
-
 }
