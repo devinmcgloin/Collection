@@ -12,8 +12,7 @@ I would like to make all collections immutable, but the focus is on having half 
 
 ## Collections
 
-- Collections (Lists, Priority Queues, Arrays, AVL Trees)
-- Sets (This is primarily its own category due to no easy way to do set indexing)
+- Collections (Lists, Priority Queues, Arrays, AVL Trees, Sets (ordered via hashcode)
 - Maps
 
 ## Operations

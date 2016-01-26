@@ -1,5 +1,5 @@
 
-# Created by https://www.gitignore.io/api/java,maven,osx,intellij
+# Created by https://www.gitignore.io/api/java,maven,osx,intellij,vim
 
 ### Java ###
 *.class
@@ -34,7 +34,8 @@ buildNumber.properties
 .LSOverride
 
 # Icon must end with two \r
-Icon
+Icon
+
 
 # Thumbnails
 ._*
@@ -105,3 +106,10 @@ crashlytics.properties
 crashlytics-build.properties
 fabric.properties
 
+### Vim ###
+[._]*.s[a-w][a-z]
+[._]s[a-w][a-z]
+*.un~
+Session.vim
+.netrwhist
+*~
