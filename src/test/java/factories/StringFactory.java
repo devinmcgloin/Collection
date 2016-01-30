@@ -20,13 +20,4 @@ public class StringFactory {
             populate(col, len, primer + "1");
         }
     }
-
-    public static void populate(Sequence<String> col, int len, String primer) {
-        if (primer.length() == len)
-            col.add(primer);
-        else {
-            populate(col, len, primer + "0");
-            populate(col, len, primer + "1");
-        }
-    }
 }
