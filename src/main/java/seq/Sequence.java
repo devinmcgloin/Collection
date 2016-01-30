@@ -1,32 +1,43 @@
-package datastructures;
+package seq;
+
+
+import datastructures.*;
+import stats.Recommender;
 
 import java.util.Collection;
 import java.util.Iterator;
-import java.util.PriorityQueue;
-import java.util.function.Predicate;
 import java.util.stream.Stream;
 
 /**
+ *
  * Created by devinmcgloin on 1/25/16.
+ * Meta object that holds a seq. This is the one that keeps counts
  */
-public class Queue<E> extends Seq<E> {
-    private PriorityQueue<E> elementData;
+public class Sequence<E> {
+    Seq<E> elementData;
+    Recommender rec;
 
-    /**
-     * loops to hell currently todo
-     */
-    public Queue() {
-        elementData = new PriorityQueue<>();
-    }
-
-    protected Queue(E[] arr) {
-        this();
-        for (E item : arr)
-            elementData.add(item);
-    }
-
-    public Seq.TYPE getType() {
-        return TYPE.QUEUE;
+    public Sequence(Seq.TYPE t) {
+        switch (t) {
+            case ARRAY:
+                elementData = new Array<E>();
+                break;
+            case TREE:
+                elementData = new Tree<E>();
+                break;
+            case QUEUE:
+                elementData = new Queue<E>();
+                break;
+            case SET:
+                elementData = new Set<E>();
+                break;
+            case LIST:
+                elementData = new List<E>();
+                break;
+            default:
+                throw new IllegalArgumentException("Invalid type");
+        }
+        rec = new Recommender();
     }
 
 
@@ -37,14 +48,7 @@ public class Queue<E> extends Seq<E> {
     }
 
     public E get(Integer index) {
-        int i = 0;
-        for (E item : elementData) {
-            if (i == index) {
-                return item;
-            }
-            i++;
-        }
-        return null;
+        return elementData.get(index);
     }
 
     public boolean contains(Object item) {
@@ -101,10 +105,6 @@ public class Queue<E> extends Seq<E> {
 
     public Stream<E> parallelStream() {
         return elementData.parallelStream();
-    }
-
-    public boolean removeIf(Predicate<? super E> filter) {
-        return elementData.removeIf(filter);
     }
 
     public boolean retainAll(Collection<?> c) {

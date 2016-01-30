@@ -2,31 +2,29 @@ package datastructures;
 
 import java.util.Collection;
 import java.util.Iterator;
-import java.util.PriorityQueue;
+import java.util.TreeSet;
 import java.util.function.Predicate;
 import java.util.stream.Stream;
 
 /**
  * Created by devinmcgloin on 1/25/16.
  */
-public class Queue<E> extends Seq<E> {
-    private PriorityQueue<E> elementData;
+public class Tree<E> extends Seq<E> {
 
-    /**
-     * loops to hell currently todo
-     */
-    public Queue() {
-        elementData = new PriorityQueue<>();
+    private TreeSet<E> elementData;
+
+    public Tree() {
+        elementData = new TreeSet<>();
     }
 
-    protected Queue(E[] arr) {
+    protected Tree(E[] arr) {
         this();
         for (E item : arr)
             elementData.add(item);
     }
 
     public Seq.TYPE getType() {
-        return TYPE.QUEUE;
+        return TYPE.TREE;
     }
 
 
