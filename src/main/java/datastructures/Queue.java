@@ -2,6 +2,7 @@ package datastructures;
 
 import java.util.Collection;
 import java.util.Iterator;
+import java.util.PriorityQueue;
 import java.util.function.Predicate;
 import java.util.stream.Stream;
 
@@ -9,13 +10,13 @@ import java.util.stream.Stream;
  * Created by devinmcgloin on 1/25/16.
  */
 public class Queue<E> extends Seq<E> {
-    private Queue<E> elementData;
+    private PriorityQueue<E> elementData;
 
     /**
      * loops to hell currently todo
      */
     public Queue() {
-        elementData = new Queue<>();
+        elementData = new PriorityQueue<>();
     }
 
     protected Queue(E[] arr) {
@@ -25,7 +26,7 @@ public class Queue<E> extends Seq<E> {
     }
 
     public Seq.TYPE getType() {
-        return TYPE.ARRAY;
+        return TYPE.QUEUE;
     }
 
 
@@ -36,7 +37,14 @@ public class Queue<E> extends Seq<E> {
     }
 
     public E get(Integer index) {
-        return elementData.get(index);
+        int i = 0;
+        for (E item : elementData) {
+            if (i == index) {
+                return item;
+            }
+            i++;
+        }
+        return null;
     }
 
     public boolean contains(Object item) {

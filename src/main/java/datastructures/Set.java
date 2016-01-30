@@ -24,7 +24,7 @@ public class Set<E> extends Seq<E> {
     }
 
     public Seq.TYPE getType() {
-        return TYPE.ARRAY;
+        return TYPE.SET;
     }
 
 

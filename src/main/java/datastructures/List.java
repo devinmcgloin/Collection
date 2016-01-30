@@ -24,7 +24,7 @@ public class List<E> extends Seq<E> {
     }
 
     public Seq.TYPE getType() {
-        return TYPE.ARRAY;
+        return TYPE.LIST;
     }
 
     ///-------------------- JAVA BOILERPLATE -------------------------------------///
