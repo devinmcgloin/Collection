@@ -20,4 +20,8 @@ public class Tuple<E, T> {
     public T getSecond() {
         return second;
     }
+
+    public String toString() {
+        return "[" + first.toString() + ", " + second.toString() + "]";
+    }
 }

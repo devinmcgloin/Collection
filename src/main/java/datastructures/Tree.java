@@ -2,22 +2,22 @@ package datastructures;
 
 import java.util.Collection;
 import java.util.Iterator;
-import java.util.LinkedList;
+import java.util.TreeSet;
 import java.util.function.Predicate;
 import java.util.stream.Stream;
 
 /**
  * Created by devinmcgloin on 1/25/16.
  */
-public class List<E> extends Seq<E> {
+public class Tree<E> extends Seq<E> {
 
-    private LinkedList<E> elementData;
+    private TreeSet<E> elementData;
 
-    public List() {
-        elementData = new LinkedList<>();
+    public Tree() {
+        elementData = new TreeSet<>();
     }
 
-    protected List(E[] arr) {
+    protected Tree(E[] arr) {
         this();
         for (E item : arr)
             elementData.add(item);
@@ -27,6 +27,7 @@ public class List<E> extends Seq<E> {
         return TYPE.ARRAY;
     }
 
+
     ///-------------------- JAVA BOILERPLATE -------------------------------------///
 
     public boolean remove(Object item) {
@@ -34,7 +35,14 @@ public class List<E> extends Seq<E> {
     }
 
     public E get(Integer index) {
-        return elementData.get(index);
+        int i = 0;
+        for (E item : elementData) {
+            if (i == index) {
+                return item;
+            }
+            i++;
+        }
+        return null;
     }
 
     public boolean contains(Object item) {
@@ -104,5 +112,4 @@ public class List<E> extends Seq<E> {
     public int size() {
         return elementData.size();
     }
-
 }

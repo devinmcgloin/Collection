@@ -2,7 +2,6 @@ package datastructures;
 
 import org.junit.Before;
 import org.junit.Test;
-import seq.Seq;
 
 import java.util.ArrayList;
 import java.util.Random;
@@ -23,7 +22,7 @@ public class ArrayTest {
         arr = new Array<>();
         arrayList = new ArrayList<>();
         for (int i = 0; i < 100; i += 3) {
-            arr = arr.add(i);
+            arr.add(i);
             arrayList.add(i);
         }
     }
@@ -41,7 +40,7 @@ public class ArrayTest {
     public void testRemove() throws Exception {
         for (int i = 0; i < 100; i += 2) {
             arrayList.remove((Integer) i);
-            arr = arr.remove(i);
+            arr.remove(i);
         }
 
         for (int i = 0; i < arrayList.size(); i++) {
@@ -67,7 +66,7 @@ public class ArrayTest {
                 if (integer.equals(searching))
                     found = true;
             }
-            assertEquals(found, arr.isMember(searching));
+            assertEquals(found, arr.contains(searching));
         }
     }
 
@@ -77,7 +76,7 @@ public class ArrayTest {
         Seq<Integer> indicies = new Array<>();
         for (int i = 0; i < arrayList.size(); i += 4) {
             subset.add(arrayList.get(i));
-            indicies = indicies.add(i);
+            indicies.add(i);
         }
         arr = arr.subset(indicies);
         for (int i = 0; i < subset.size(); i++) {
