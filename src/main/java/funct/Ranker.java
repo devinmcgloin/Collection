@@ -5,5 +5,5 @@ package funct;
  * basically a fitness function, used for searches.
  */
 public interface Ranker<E> {
-
+    Double apply(E item);
 }
