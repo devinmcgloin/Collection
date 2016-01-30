@@ -39,7 +39,7 @@ public class Array<E> extends Seq<E> {
     }
 
     public boolean contains(Object item) {
-        return elementData.contains(item);
+        return indexOf(item) > 0;
     }
 
     public boolean containsAll(Collection<?> c) {
@@ -104,5 +104,32 @@ public class Array<E> extends Seq<E> {
 
     public int size() {
         return elementData.size();
+    }
+
+    private int indexOf(Object item) {
+        if (isSorted()) {
+            int high = size();
+            int low = 0;
+            int mid;
+            while (high >= low) {
+                mid = (low + high) >>> 1;
+                int cmp = getComparator().compare((E) item, elementData.get(mid));
+
+                if (cmp < 0) {
+                    low = mid + 1;
+                } else if (cmp > 0) {
+                    high = mid - 1;
+                } else
+                    return mid;
+            }
+            return -(low + 1);
+        } else {
+
+            for (int i = 0; i < elementData.size(); i++) {
+                if (elementData.get(i).equals(item))
+                    return i;
+            }
+            return -size();
+        }
     }
 }

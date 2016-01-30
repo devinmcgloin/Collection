@@ -12,9 +12,7 @@ import java.util.stream.Stream;
 public class Queue<E> extends Seq<E> {
     private PriorityQueue<E> elementData;
 
-    /**
-     * loops to hell currently todo
-     */
+
     public Queue() {
         elementData = new PriorityQueue<>();
     }
@@ -33,10 +31,16 @@ public class Queue<E> extends Seq<E> {
     ///-------------------- JAVA BOILERPLATE -------------------------------------///
 
     public boolean remove(Object item) {
+        if (item.equals(elementData.peek())) {
+            elementData.poll();
+            return true;
+        }
         return elementData.remove(item);
     }
 
     public E get(Integer index) {
+        if (index == 0)
+            return elementData.peek();
         int i = 0;
         for (E item : elementData) {
             if (i == index) {

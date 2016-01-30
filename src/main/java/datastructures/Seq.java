@@ -17,12 +17,17 @@ import java.util.Iterator;
  */
 public abstract class Seq<E> implements Collection<E> {
 
+    private boolean sorted = false;
+    private Comparator<E> comparator;
+
     public Seq() {
     }
 
     public Seq<E> sort(Comparator<E> cmp) {
         E[] arr = (E[]) toArray();
         Arrays.sort(arr, cmp);
+        sorted = true;
+        comparator = cmp;
         return switcher(getType(), arr);
     }
 
@@ -36,14 +41,19 @@ public abstract class Seq<E> implements Collection<E> {
     private Seq<E> switcher(TYPE t, E[] arr) {
         switch (t) {
             case ARRAY:
+                t = TYPE.ARRAY;
                 return new Array<E>(arr);
             case TREE:
+                t = TYPE.TREE;
                 return new Tree<E>(arr);
             case QUEUE:
+                t = TYPE.QUEUE;
                 return new Queue<E>(arr);
             case SET:
+                t = TYPE.SET;
                 return new Set<E>(arr);
             case LIST:
+                t = TYPE.LIST;
                 return new List<E>(arr);
             default:
                 throw new IllegalArgumentException("Invalid type");
@@ -53,6 +63,14 @@ public abstract class Seq<E> implements Collection<E> {
     public abstract TYPE getType();
 
     public abstract E get(Integer index);
+
+    public boolean isSorted() {
+        return sorted;
+    }
+
+    public Comparator<E> getComparator() {
+        return comparator;
+    }
 
     public Seq<E> subset(Seq<Integer> indicies) {
         Seq<E> seq = new Array<>();

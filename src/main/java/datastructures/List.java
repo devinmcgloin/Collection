@@ -30,11 +30,29 @@ public class List<E> extends Seq<E> {
     ///-------------------- JAVA BOILERPLATE -------------------------------------///
 
     public boolean remove(Object item) {
+        if (item.equals(elementData.getLast())) {
+            elementData.removeLast();
+            return true;
+        }
         return elementData.remove(item);
     }
 
+    public E remove(Integer index) {
+        if (index == 0)
+            return elementData.removeFirst();
+        else if (index == size() - 1)
+            return elementData.removeLast();
+        else
+            return elementData.remove((int) index);
+    }
+
     public E get(Integer index) {
-        return elementData.get(index);
+        if (index == 0)
+            return elementData.getFirst();
+        else if (index == size() - 1)
+            return elementData.getLast();
+        else
+            return elementData.get(index);
     }
 
     public boolean contains(Object item) {

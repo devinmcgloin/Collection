@@ -12,19 +12,22 @@ I would like to make all collections immutable, but the focus is on having half 
 
 ## Collections
 
-- Collections (Lists, Priority Queues, Arrays, AVL Trees, Sets (ordered via hashcode)
-- Maps
+- Set
+- List
+- Queue
+- Map
 
 ## Operations
 
 - Map 
 - Filter
 - Reduce
-- Stable Sort
-- Add
-- Remove
-- get
-- membership
 - subset
-- Search
 - Group By
+
+### Special Operators
+
+- Sort
+  - Sort is special as it switches the type of datastructure used. It automatically converts to a List. 
+- Rank
+  - Rank automatically converts the collection to a queue. 
