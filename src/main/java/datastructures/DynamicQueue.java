@@ -1,9 +1,5 @@
 package datastructures;
 
-import funct.Functor;
-import funct.Ranker;
-import funct.Reductor;
-
 import java.util.*;
 import java.util.function.Consumer;
 import java.util.function.Predicate;
@@ -11,128 +7,150 @@ import java.util.stream.Stream;
 
 /**
  * Created by devinmcgloin on 1/25/16.
- * Sequence that switches between sets lists and queues depending on the action called.
- * Sorting makes the Seq take list form, and ranking produces a Queue.
- * - Note these changes are internal to Seq, and are not apparent to the outside user.
- * <p/>
- * Seq also allows for map, filter, reduce operations, as well as grouping by a field, and getting subsets.
  */
-public class Seq<E> implements Collection<E> {
+public class DynamicQueue<E> implements Queue<E> {
 
-    final boolean locked;
-    TYPE type;
-    Comparator<E> cmp = null;
-    private Collection<E> collection;
+    private Queue<E> data;
+    private QUEUETYPE type;
 
-    public Seq() {
-        this(TYPE.SET, false);
+    public DynamicQueue() {
+        data = new PriorityQueue<>();
+        type = QUEUETYPE.PRIORITYQUEUE;
     }
 
-    public Seq(TYPE type) {
-        this(type, false);
+    public DynamicQueue(Comparator<E> cmp, E[] arr) {
+        data = new PriorityQueue<>(cmp);
+        type = QUEUETYPE.PRIORITYQUEUE;
+        for (E item : arr)
+            add(item);
     }
 
-    public Seq(TYPE type, boolean locked) {
+    public DynamicQueue(QUEUETYPE type) {
+        this.type = type;
         switch (type) {
-            case SET:
-                collection = new DynamicSet<E>();
-                break;
-            case LIST:
-                collection = new DynamicList<E>();
-                break;
-            case QUEUE:
-                collection = new DynamicQueue<E>();
+            case PRIORITYQUEUE:
+                data = new PriorityQueue<>();
                 break;
         }
-        this.locked = locked;
-        this.type = type;
     }
 
-    public void search(Ranker<E> ranker) {
-        Comparator<E> cmp = (o1, o2) -> (int) Math.floor(ranker.apply(o2) - ranker.apply(o1));
-        this.cmp = cmp;
-        convert(TYPE.QUEUE);
+    public DynamicQueue(E[] arr) {
+        this();
+        for (E item : arr)
+            add(item);
     }
 
-    public void sort(Comparator<E> cmp) {
-        convert(TYPE.LIST);
-        DynamicList<E> list = (DynamicList<E>) collection;
-        list.sort(cmp);
-    }
-
-    /**
-     * @param reductor
-     * @return
-     */
-    public E reduce(Reductor<E> reductor) {
-        for (E item : this)
-            reductor.accept(item);
-        return reductor.result();
-    }
-
-    /**
-     * @param functor
-     * @param <T>
-     * @return
-     */
-    public <T> Seq<T> map(Functor<E, T> functor) {
-        Seq<T> seq = new Seq<T>();
-        for (E item : this)
-            seq.add(functor.apply(item));
-        return seq;
-    }
-
-    /**
-     * @param predicate
-     * @return
-     */
-    public void filter(Predicate<E> predicate) {
-        removeIf(predicate.negate());
-    }
-
-    private void convert(TYPE t) {
-        if (locked || this.type == t)
+    public void convert(QUEUETYPE t) {
+        if (this.type == t) {
             return;
+        }
         E[] arr;
         switch (t) {
-            case SET:
+            case PRIORITYQUEUE:
                 arr = (E[]) toArray();
-                collection = new DynamicSet<>(arr);
-                break;
-            case LIST:
-                arr = (E[]) toArray();
-                collection = new DynamicList<>(arr);
-                break;
-            case QUEUE:
-                arr = (E[]) toArray();
-                if (cmp != null)
-                    collection = new DynamicQueue<>(cmp, arr);
-                else
-                    collection = new DynamicQueue<>(arr);
+                data = new PriorityQueue<>(Arrays.asList(arr));
                 break;
         }
     }
 
+    @Override
+    public String toString() {
+        return "DynamicQueue{" +
+                "type=" + type +
+                ", data=" + data +
+                '}';
+    }
+
     /**
-     * Performs the given action for each element of the {@code Iterable}
-     * until all elements have been processed or the action throws an
-     * exception.  Unless otherwise specified by the implementing class,
-     * actions are performed in the order of iteration (if an iteration order
-     * is specified).  Exceptions thrown by the action are relayed to the
-     * caller.
+     * Inserts the specified element into this queue if it is possible to do so
+     * immediately without violating capacity restrictions, returning
+     * {@code true} upon success and throwing an {@code IllegalStateException}
+     * if no space is currently available.
      *
-     * @param action The action to be performed for each element
-     * @throws NullPointerException if the specified action is null
-     * @implSpec <p>The default implementation behaves as if:
-     * <pre>{@code
-     *     for (T type : this)
-     *         action.accept(type);
-     * }</pre>
-     * @since 1.8
+     * @param e the element to add
+     * @return {@code true} (as specified by {@link Collection#add})
+     * @throws IllegalStateException    if the element cannot be added at this
+     *                                  time due to capacity restrictions
+     * @throws ClassCastException       if the class of the specified element
+     *                                  prevents it from being added to this queue
+     * @throws NullPointerException     if the specified element is null and
+     *                                  this queue does not permit null elements
+     * @throws IllegalArgumentException if some property of this element
+     *                                  prevents it from being added to this queue
      */
     @Override
-    public void forEach(Consumer<? super E> action) {
-        collection.forEach(action);
+    public boolean add(E e) {
+        return data.add(e);
+    }
+
+    /**
+     * Inserts the specified element into this queue if it is possible to do
+     * so immediately without violating capacity restrictions.
+     * When using a capacity-restricted queue, this method is generally
+     * preferable to {@link #add}, which can fail to insert an element only
+     * by throwing an exception.
+     *
+     * @param e the element to add
+     * @return {@code true} if the element was added to this queue, else
+     * {@code false}
+     * @throws ClassCastException       if the class of the specified element
+     *                                  prevents it from being added to this queue
+     * @throws NullPointerException     if the specified element is null and
+     *                                  this queue does not permit null elements
+     * @throws IllegalArgumentException if some property of this element
+     *                                  prevents it from being added to this queue
+     */
+    @Override
+    public boolean offer(E e) {
+        return data.offer(e);
+    }
+
+    /**
+     * Retrieves and removes the head of this queue.  This method differs
+     * from {@link #poll poll} only in that it throws an exception if this
+     * queue is empty.
+     *
+     * @return the head of this queue
+     * @throws NoSuchElementException if this queue is empty
+     */
+    @Override
+    public E remove() {
+        return data.remove();
+    }
+
+    /**
+     * Retrieves and removes the head of this queue,
+     * or returns {@code null} if this queue is empty.
+     *
+     * @return the head of this queue, or {@code null} if this queue is empty
+     */
+    @Override
+    public E poll() {
+        return data.poll();
+    }
+
+    /**
+     * Retrieves, but does not remove, the head of this queue.  This method
+     * differs from {@link #peek peek} only in that it throws an exception
+     * if this queue is empty.
+     *
+     * @return the head of this queue
+     * @throws NoSuchElementException if this queue is empty
+     */
+    @Override
+    public E element() {
+        return data.element();
+    }
+
+    /**
+     * Retrieves, but does not remove, the head of this queue,
+     * or returns {@code null} if this queue is empty.
+     *
+     * @return the head of this queue, or {@code null} if this queue is empty
+     */
+    @Override
+    public E peek() {
+        return data.peek();
     }
 
     /**
@@ -144,7 +162,7 @@ public class Seq<E> implements Collection<E> {
      */
     @Override
     public int size() {
-        return collection.size();
+        return data.size();
     }
 
     /**
@@ -154,7 +172,7 @@ public class Seq<E> implements Collection<E> {
      */
     @Override
     public boolean isEmpty() {
-        return collection.isEmpty();
+        return data.isEmpty();
     }
 
     /**
@@ -175,7 +193,7 @@ public class Seq<E> implements Collection<E> {
      */
     @Override
     public boolean contains(Object o) {
-        return collection.contains(o);
+        return data.contains(o);
     }
 
     /**
@@ -188,7 +206,7 @@ public class Seq<E> implements Collection<E> {
      */
     @Override
     public Iterator<E> iterator() {
-        return collection.iterator();
+        return data.iterator();
     }
 
     /**
@@ -209,7 +227,7 @@ public class Seq<E> implements Collection<E> {
      */
     @Override
     public Object[] toArray() {
-        return collection.toArray();
+        return data.toArray();
     }
 
     /**
@@ -256,45 +274,7 @@ public class Seq<E> implements Collection<E> {
      */
     @Override
     public <T> T[] toArray(T[] a) {
-        return collection.toArray(a);
-    }
-
-    /**
-     * Ensures that this collection contains the specified element (optional
-     * operation).  Returns <tt>true</tt> if this collection changed as a
-     * result of the call.  (Returns <tt>false</tt> if this collection does
-     * not permit duplicates and already contains the specified element.)<p>
-     * <p/>
-     * Collections that support this operation may place limitations on what
-     * elements may be added to this collection.  In particular, some
-     * collections will refuse to add <tt>null</tt> elements, and others will
-     * impose restrictions on the type of elements that may be added.
-     * Collection classes should clearly specify in their documentation any
-     * restrictions on what elements may be added.<p>
-     * <p/>
-     * If a collection refuses to add a particular element for any reason
-     * other than that it already contains the element, it <i>must</i> throw
-     * an exception (rather than returning <tt>false</tt>).  This preserves
-     * the invariant that a collection always contains the specified element
-     * after this call returns.
-     *
-     * @param e element whose presence in this collection is to be ensured
-     * @return <tt>true</tt> if this collection changed as a result of the
-     * call
-     * @throws UnsupportedOperationException if the <tt>add</tt> operation
-     *                                       is not supported by this collection
-     * @throws ClassCastException            if the class of the specified element
-     *                                       prevents it from being added to this collection
-     * @throws NullPointerException          if the specified element is null and this
-     *                                       collection does not permit null elements
-     * @throws IllegalArgumentException      if some property of the element
-     *                                       prevents it from being added to this collection
-     * @throws IllegalStateException         if the element cannot be added at this
-     *                                       time due to insertion restrictions
-     */
-    @Override
-    public boolean add(E e) {
-        return collection.add(e);
+        return data.toArray(a);
     }
 
     /**
@@ -319,7 +299,7 @@ public class Seq<E> implements Collection<E> {
      */
     @Override
     public boolean remove(Object o) {
-        return collection.remove(o);
+        return data.remove(o);
     }
 
     /**
@@ -342,7 +322,7 @@ public class Seq<E> implements Collection<E> {
      */
     @Override
     public boolean containsAll(Collection<?> c) {
-        return collection.containsAll(c);
+        return data.containsAll(c);
     }
 
     /**
@@ -371,7 +351,7 @@ public class Seq<E> implements Collection<E> {
      */
     @Override
     public boolean addAll(Collection<? extends E> c) {
-        return collection.addAll(c);
+        return data.addAll(c);
     }
 
     /**
@@ -399,32 +379,7 @@ public class Seq<E> implements Collection<E> {
      */
     @Override
     public boolean removeAll(Collection<?> c) {
-        return collection.removeAll(c);
-    }
-
-    /**
-     * Removes all of the elements of this collection that satisfy the given
-     * predicate.  Errors or runtime exceptions thrown during iteration or by
-     * the predicate are relayed to the caller.
-     *
-     * @param filter a predicate which returns {@code true} for elements to be
-     *               removed
-     * @return {@code true} if any elements were removed
-     * @throws NullPointerException          if the specified filter is null
-     * @throws UnsupportedOperationException if elements cannot be removed
-     *                                       from this collection.  Implementations may throw this exception if a
-     *                                       matching element cannot be removed or if, in general, removal is not
-     *                                       supported.
-     * @implSpec The default implementation traverses all elements of the collection using
-     * its {@link #iterator}.  Each matching element is removed using
-     * {@link Iterator#remove()}.  If the collection's iterator does not
-     * support removal then an {@code UnsupportedOperationException} will be
-     * thrown on the first matching element.
-     * @since 1.8
-     */
-    @Override
-    public boolean removeIf(Predicate<? super E> filter) {
-        return collection.removeIf(filter);
+        return data.removeAll(c);
     }
 
     /**
@@ -451,7 +406,7 @@ public class Seq<E> implements Collection<E> {
      */
     @Override
     public boolean retainAll(Collection<?> c) {
-        return collection.retainAll(c);
+        return data.retainAll(c);
     }
 
     /**
@@ -463,7 +418,32 @@ public class Seq<E> implements Collection<E> {
      */
     @Override
     public void clear() {
-        collection.clear();
+        data.clear();
+    }
+
+    /**
+     * Removes all of the elements of this collection that satisfy the given
+     * predicate.  Errors or runtime exceptions thrown during iteration or by
+     * the predicate are relayed to the caller.
+     *
+     * @param filter a predicate which returns {@code true} for elements to be
+     *               removed
+     * @return {@code true} if any elements were removed
+     * @throws NullPointerException          if the specified filter is null
+     * @throws UnsupportedOperationException if elements cannot be removed
+     *                                       from this collection.  Implementations may throw this exception if a
+     *                                       matching element cannot be removed or if, in general, removal is not
+     *                                       supported.
+     * @implSpec The default implementation traverses all elements of the collection using
+     * its {@link #iterator}.  Each matching element is removed using
+     * {@link Iterator#remove()}.  If the collection's iterator does not
+     * support removal then an {@code UnsupportedOperationException} will be
+     * thrown on the first matching element.
+     * @since 1.8
+     */
+    @Override
+    public boolean removeIf(Predicate<? super E> filter) {
+        return data.removeIf(filter);
     }
 
     /**
@@ -514,7 +494,7 @@ public class Seq<E> implements Collection<E> {
      */
     @Override
     public Spliterator<E> spliterator() {
-        return collection.spliterator();
+        return data.spliterator();
     }
 
     /**
@@ -532,7 +512,7 @@ public class Seq<E> implements Collection<E> {
      */
     @Override
     public Stream<E> stream() {
-        return collection.stream();
+        return data.stream();
     }
 
     /**
@@ -552,138 +532,32 @@ public class Seq<E> implements Collection<E> {
      */
     @Override
     public Stream<E> parallelStream() {
-        return collection.parallelStream();
+        return data.parallelStream();
     }
 
     /**
-     * Returns a hash code value for the object. This method is
-     * supported for the benefit of hash tables such as those provided by
-     * {@link HashMap}.
-     * <p/>
-     * The general contract of {@code hashCode} is:
-     * <ul>
-     * <li>Whenever it is invoked on the same object more than once during
-     * an execution of a Java application, the {@code hashCode} method
-     * must consistently return the same integer, provided no information
-     * used in {@code equals} comparisons on the object is modified.
-     * This integer need not remain consistent from one execution of an
-     * application to another execution of the same application.
-     * <li>If two objects are equal according to the {@code equals(Object)}
-     * method, then calling the {@code hashCode} method on each of
-     * the two objects must produce the same integer result.
-     * <li>It is <em>not</em> required that if two objects are unequal
-     * according to the {@link Object#equals(Object)}
-     * method, then calling the {@code hashCode} method on each of the
-     * two objects must produce distinct integer results.  However, the
-     * programmer should be aware that producing distinct integer results
-     * for unequal objects may improve the performance of hash tables.
-     * </ul>
-     * <p/>
-     * As much as is reasonably practical, the hashCode method defined by
-     * class {@code Object} does return distinct integers for distinct
-     * objects. (This is typically implemented by converting the internal
-     * address of the object into an integer, but this implementation
-     * technique is not required by the
-     * Java&trade; programming language.)
+     * Performs the given action for each element of the {@code Iterable}
+     * until all elements have been processed or the action throws an
+     * exception.  Unless otherwise specified by the implementing class,
+     * actions are performed in the order of iteration (if an iteration order
+     * is specified).  Exceptions thrown by the action are relayed to the
+     * caller.
      *
-     * @return a hash code value for this object.
-     * @see Object#equals(Object)
-     * @see System#identityHashCode
+     * @param action The action to be performed for each element
+     * @throws NullPointerException if the specified action is null
+     * @implSpec <p>The default implementation behaves as if:
+     * <pre>{@code
+     *     for (T type : this)
+     *         action.accept(type);
+     * }</pre>
+     * @since 1.8
      */
     @Override
-    public int hashCode() {
-        return collection.hashCode();
+    public void forEach(Consumer<? super E> action) {
+        data.forEach(action);
     }
 
-    /**
-     * Returns a string representation of the object. In general, the
-     * {@code toString} method returns a string that
-     * "textually represents" this object. The result should
-     * be a concise but informative representation that is easy for a
-     * person to read.
-     * It is recommended that all subclasses override this method.
-     * <p/>
-     * The {@code toString} method for class {@code Object}
-     * returns a string consisting of the name of the class of which the
-     * object is an instance, the at-sign character `{@code @}', and
-     * the unsigned hexadecimal representation of the hash code of the
-     * object. In other words, this method returns a string equal to the
-     * value of:
-     * <blockquote>
-     * <pre>
-     * getClass().getName() + '@' + Integer.toHexString(hashCode())
-     * </pre></blockquote>
-     *
-     * @return a string representation of the object.
-     */
-    @Override
-    public String toString() {
-        return collection.toString();
-    }
-
-    /**
-     * Indicates whether some other object is "equal to" this one.
-     * <p/>
-     * The {@code equals} method implements an equivalence relation
-     * on non-null object references:
-     * <ul>
-     * <li>It is <i>reflexive</i>: for any non-null reference value
-     * {@code x}, {@code x.equals(x)} should return
-     * {@code true}.
-     * <li>It is <i>symmetric</i>: for any non-null reference values
-     * {@code x} and {@code y}, {@code x.equals(y)}
-     * should return {@code true} if and only if
-     * {@code y.equals(x)} returns {@code true}.
-     * <li>It is <i>transitive</i>: for any non-null reference values
-     * {@code x}, {@code y}, and {@code z}, if
-     * {@code x.equals(y)} returns {@code true} and
-     * {@code y.equals(z)} returns {@code true}, then
-     * {@code x.equals(z)} should return {@code true}.
-     * <li>It is <i>consistent</i>: for any non-null reference values
-     * {@code x} and {@code y}, multiple invocations of
-     * {@code x.equals(y)} consistently return {@code true}
-     * or consistently return {@code false}, provided no
-     * information used in {@code equals} comparisons on the
-     * objects is modified.
-     * <li>For any non-null reference value {@code x},
-     * {@code x.equals(null)} should return {@code false}.
-     * </ul>
-     * <p/>
-     * The {@code equals} method for class {@code Object} implements
-     * the most discriminating possible equivalence relation on objects;
-     * that is, for any non-null reference values {@code x} and
-     * {@code y}, this method returns {@code true} if and only
-     * if {@code x} and {@code y} refer to the same object
-     * ({@code x == y} has the value {@code true}).
-     * <p/>
-     * Note that it is generally necessary to override the {@code hashCode}
-     * method whenever this method is overridden, so as to maintain the
-     * general contract for the {@code hashCode} method, which states
-     * that equal objects must have equal hash codes.
-     *
-     * @param obj the reference object with which to compare.
-     * @return {@code true} if this object is the same as the obj
-     * argument; {@code false} otherwise.
-     * @see #hashCode()
-     * @see HashMap
-     */
-    @Override
-    public boolean equals(Object obj) {
-        return collection.equals(obj);
-    }
-
-
-    @Override
-    protected Seq<E> clone() {
-        Seq<E> col = new Seq<>();
-        for (E item : this) {
-            col.add(item);
-        }
-        return col;
-    }
-
-
-    public enum TYPE {
-        SET, LIST, QUEUE
+    public enum QUEUETYPE {
+        PRIORITYQUEUE
     }
 }
