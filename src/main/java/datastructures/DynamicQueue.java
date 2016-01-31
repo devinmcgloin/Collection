@@ -10,35 +10,56 @@ import java.util.stream.Stream;
  */
 public class DynamicQueue<E> implements Queue<E> {
 
-    private Queue<E> container;
-    private QUEUETYPE t;
+    private Queue<E> data;
+    private QUEUETYPE type;
 
-    public DynamicQueue(){
-        container = new PriorityQueue<>();
-        t = QUEUETYPE.PRIORITYQUEUE;
+    public DynamicQueue() {
+        data = new PriorityQueue<>();
+        type = QUEUETYPE.PRIORITYQUEUE;
     }
-    public DynamicQueue(QUEUETYPE t){
-        this.t = t;
-        switch (t) {
+
+    public DynamicQueue(Comparator<E> cmp, E[] arr) {
+        data = new PriorityQueue<>(cmp);
+        type = QUEUETYPE.PRIORITYQUEUE;
+        for (E item : arr)
+            add(item);
+    }
+
+    public DynamicQueue(QUEUETYPE type) {
+        this.type = type;
+        switch (type) {
             case PRIORITYQUEUE:
-                container = new PriorityQueue<>();
+                data = new PriorityQueue<>();
                 break;
         }
     }
 
-    public void convert(QUEUETYPE t){
-        if (this.t == t) {
+    public DynamicQueue(E[] arr) {
+        this();
+        for (E item : arr)
+            add(item);
+    }
+
+    public void convert(QUEUETYPE t) {
+        if (this.type == t) {
             return;
         }
         E[] arr;
         switch (t) {
             case PRIORITYQUEUE:
-                arr = (E[])toArray();
-                container = new PriorityQueue<>(Arrays.asList(arr));
+                arr = (E[]) toArray();
+                data = new PriorityQueue<>(Arrays.asList(arr));
                 break;
         }
     }
 
+    @Override
+    public String toString() {
+        return "DynamicQueue{" +
+                "type=" + type +
+                ", data=" + data +
+                '}';
+    }
 
     /**
      * Inserts the specified element into this queue if it is possible to do so
@@ -59,7 +80,7 @@ public class DynamicQueue<E> implements Queue<E> {
      */
     @Override
     public boolean add(E e) {
-        return container.add(e);
+        return data.add(e);
     }
 
     /**
@@ -81,7 +102,7 @@ public class DynamicQueue<E> implements Queue<E> {
      */
     @Override
     public boolean offer(E e) {
-        return container.offer(e);
+        return data.offer(e);
     }
 
     /**
@@ -94,7 +115,7 @@ public class DynamicQueue<E> implements Queue<E> {
      */
     @Override
     public E remove() {
-        return container.remove();
+        return data.remove();
     }
 
     /**
@@ -105,7 +126,7 @@ public class DynamicQueue<E> implements Queue<E> {
      */
     @Override
     public E poll() {
-        return container.poll();
+        return data.poll();
     }
 
     /**
@@ -118,7 +139,7 @@ public class DynamicQueue<E> implements Queue<E> {
      */
     @Override
     public E element() {
-        return container.element();
+        return data.element();
     }
 
     /**
@@ -129,7 +150,7 @@ public class DynamicQueue<E> implements Queue<E> {
      */
     @Override
     public E peek() {
-        return container.peek();
+        return data.peek();
     }
 
     /**
@@ -141,7 +162,7 @@ public class DynamicQueue<E> implements Queue<E> {
      */
     @Override
     public int size() {
-        return container.size();
+        return data.size();
     }
 
     /**
@@ -151,7 +172,7 @@ public class DynamicQueue<E> implements Queue<E> {
      */
     @Override
     public boolean isEmpty() {
-        return container.isEmpty();
+        return data.isEmpty();
     }
 
     /**
@@ -172,7 +193,7 @@ public class DynamicQueue<E> implements Queue<E> {
      */
     @Override
     public boolean contains(Object o) {
-        return container.contains(o);
+        return data.contains(o);
     }
 
     /**
@@ -185,7 +206,7 @@ public class DynamicQueue<E> implements Queue<E> {
      */
     @Override
     public Iterator<E> iterator() {
-        return container.iterator();
+        return data.iterator();
     }
 
     /**
@@ -193,12 +214,12 @@ public class DynamicQueue<E> implements Queue<E> {
      * If this collection makes any guarantees as to what order its elements
      * are returned by its iterator, this method must return the elements in
      * the same order.
-     * <p>
+     * <p/>
      * <p>The returned array will be "safe" in that no references to it are
      * maintained by this collection.  (In other words, this method must
      * allocate a new array even if this collection is backed by an array).
      * The caller is thus free to modify the returned array.
-     * <p>
+     * <p/>
      * <p>This method acts as bridge between array-based and collection-based
      * APIs.
      *
@@ -206,7 +227,7 @@ public class DynamicQueue<E> implements Queue<E> {
      */
     @Override
     public Object[] toArray() {
-        return container.toArray();
+        return data.toArray();
     }
 
     /**
@@ -215,30 +236,30 @@ public class DynamicQueue<E> implements Queue<E> {
      * If the collection fits in the specified array, it is returned therein.
      * Otherwise, a new array is allocated with the runtime type of the
      * specified array and the size of this collection.
-     * <p>
+     * <p/>
      * <p>If this collection fits in the specified array with room to spare
      * (i.e., the array has more elements than this collection), the element
      * in the array immediately following the end of the collection is set to
      * <tt>null</tt>.  (This is useful in determining the length of this
      * collection <i>only</i> if the caller knows that this collection does
      * not contain any <tt>null</tt> elements.)
-     * <p>
+     * <p/>
      * <p>If this collection makes any guarantees as to what order its elements
      * are returned by its iterator, this method must return the elements in
      * the same order.
-     * <p>
+     * <p/>
      * <p>Like the {@link #toArray()} method, this method acts as bridge between
      * array-based and collection-based APIs.  Further, this method allows
      * precise control over the runtime type of the output array, and may,
      * under certain circumstances, be used to save allocation costs.
-     * <p>
+     * <p/>
      * <p>Suppose <tt>x</tt> is a collection known to contain only strings.
      * The following code can be used to dump the collection into a newly
      * allocated array of <tt>String</tt>:
-     * <p>
+     * <p/>
      * <pre>
      *     String[] y = x.toArray(new String[0]);</pre>
-     * <p>
+     * <p/>
      * Note that <tt>toArray(new Object[0])</tt> is identical in function to
      * <tt>toArray()</tt>.
      *
@@ -253,7 +274,7 @@ public class DynamicQueue<E> implements Queue<E> {
      */
     @Override
     public <T> T[] toArray(T[] a) {
-        return container.toArray(a);
+        return data.toArray(a);
     }
 
     /**
@@ -278,7 +299,7 @@ public class DynamicQueue<E> implements Queue<E> {
      */
     @Override
     public boolean remove(Object o) {
-        return container.remove(o);
+        return data.remove(o);
     }
 
     /**
@@ -301,7 +322,7 @@ public class DynamicQueue<E> implements Queue<E> {
      */
     @Override
     public boolean containsAll(Collection<?> c) {
-        return container.containsAll(c);
+        return data.containsAll(c);
     }
 
     /**
@@ -330,7 +351,7 @@ public class DynamicQueue<E> implements Queue<E> {
      */
     @Override
     public boolean addAll(Collection<? extends E> c) {
-        return container.addAll(c);
+        return data.addAll(c);
     }
 
     /**
@@ -358,7 +379,7 @@ public class DynamicQueue<E> implements Queue<E> {
      */
     @Override
     public boolean removeAll(Collection<?> c) {
-        return container.removeAll(c);
+        return data.removeAll(c);
     }
 
     /**
@@ -385,7 +406,7 @@ public class DynamicQueue<E> implements Queue<E> {
      */
     @Override
     public boolean retainAll(Collection<?> c) {
-        return container.retainAll(c);
+        return data.retainAll(c);
     }
 
     /**
@@ -397,7 +418,7 @@ public class DynamicQueue<E> implements Queue<E> {
      */
     @Override
     public void clear() {
-        container.clear();
+        data.clear();
     }
 
     /**
@@ -422,17 +443,17 @@ public class DynamicQueue<E> implements Queue<E> {
      */
     @Override
     public boolean removeIf(Predicate<? super E> filter) {
-        return container.removeIf(filter);
+        return data.removeIf(filter);
     }
 
     /**
      * Creates a {@link Spliterator} over the elements in this collection.
-     * <p>
+     * <p/>
      * Implementations should document characteristic values reported by the
      * spliterator.  Such characteristic values are not required to be reported
      * if the spliterator reports {@link Spliterator#SIZED} and this collection
      * contains no elements.
-     * <p>
+     * <p/>
      * <p>The default implementation should be overridden by subclasses that
      * can return a more efficient spliterator.  In order to
      * preserve expected laziness behavior for the {@link #stream()} and
@@ -457,11 +478,11 @@ public class DynamicQueue<E> implements Queue<E> {
      * <em><a href="Spliterator.html#binding">late-binding</a></em> spliterator
      * from the collections's {@code Iterator}.  The spliterator inherits the
      * <em>fail-fast</em> properties of the collection's iterator.
-     * <p>
+     * <p/>
      * The created {@code Spliterator} reports {@link Spliterator#SIZED}.
      * @implNote The created {@code Spliterator} additionally reports
      * {@link Spliterator#SUBSIZED}.
-     * <p>
+     * <p/>
      * <p>If a spliterator covers no elements then the reporting of additional
      * characteristic values, beyond that of {@code SIZED} and {@code SUBSIZED},
      * does not aid clients to control, specialize or simplify computation.
@@ -473,12 +494,12 @@ public class DynamicQueue<E> implements Queue<E> {
      */
     @Override
     public Spliterator<E> spliterator() {
-        return container.spliterator();
+        return data.spliterator();
     }
 
     /**
      * Returns a sequential {@code Stream} with this collection as its source.
-     * <p>
+     * <p/>
      * <p>This method should be overridden when the {@link #spliterator()}
      * method cannot return a spliterator that is {@code IMMUTABLE},
      * {@code CONCURRENT}, or <em>late-binding</em>. (See {@link #spliterator()}
@@ -491,13 +512,13 @@ public class DynamicQueue<E> implements Queue<E> {
      */
     @Override
     public Stream<E> stream() {
-        return container.stream();
+        return data.stream();
     }
 
     /**
      * Returns a possibly parallel {@code Stream} with this collection as its
      * source.  It is allowable for this method to return a sequential stream.
-     * <p>
+     * <p/>
      * <p>This method should be overridden when the {@link #spliterator()}
      * method cannot return a spliterator that is {@code IMMUTABLE},
      * {@code CONCURRENT}, or <em>late-binding</em>. (See {@link #spliterator()}
@@ -511,7 +532,7 @@ public class DynamicQueue<E> implements Queue<E> {
      */
     @Override
     public Stream<E> parallelStream() {
-        return container.parallelStream();
+        return data.parallelStream();
     }
 
     /**
@@ -526,14 +547,14 @@ public class DynamicQueue<E> implements Queue<E> {
      * @throws NullPointerException if the specified action is null
      * @implSpec <p>The default implementation behaves as if:
      * <pre>{@code
-     *     for (T t : this)
-     *         action.accept(t);
+     *     for (T type : this)
+     *         action.accept(type);
      * }</pre>
      * @since 1.8
      */
     @Override
     public void forEach(Consumer<? super E> action) {
-        container.forEach(action);
+        data.forEach(action);
     }
 
     public enum QUEUETYPE {

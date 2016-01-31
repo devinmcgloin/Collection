@@ -10,39 +10,53 @@ import java.util.stream.Stream;
  */
 public class DynamicSet<E> implements Set<E> {
 
-    private SETTYPE t;
-    private Set<E> container;
+    private SETTYPE type;
+    private Set<E> data;
 
     public DynamicSet() {
-        t = SETTYPE.HASHSET;
-        container = new HashSet<>();
+        type = SETTYPE.HASHSET;
+        data = new HashSet<>();
     }
 
-    public DynamicSet(SETTYPE t) {
-        this.t = t;
-        switch (t) {
+    public DynamicSet(SETTYPE type) {
+        this.type = type;
+        switch (type) {
             case HASHSET:
-                container = new HashSet<>();
+                data = new HashSet<>();
                 break;
             case TREESET:
-                container = new TreeSet<>();
+                data = new TreeSet<>();
                 break;
         }
     }
 
+    public DynamicSet(E[] arr) {
+        this();
+        for (E item : arr)
+            add(item);
+    }
+
+    @Override
+    public String toString() {
+        return "DynamicSet{" +
+                "type=" + type +
+                ", data=" + data +
+                '}';
+    }
+
     public void convert(SETTYPE t) {
-        if (this.t == t) {
+        if (this.type == t) {
             return;
         }
         E[] arr;
         switch (t) {
             case HASHSET:
-                arr = (E[])toArray();
-                container = new HashSet<E>(Arrays.asList(arr));
+                arr = (E[]) toArray();
+                data = new HashSet<E>(Arrays.asList(arr));
                 break;
             case TREESET:
-                arr = (E[])toArray();
-                container = new TreeSet<>(Arrays.asList(arr));
+                arr = (E[]) toArray();
+                data = new TreeSet<>(Arrays.asList(arr));
                 break;
         }
     }
@@ -56,7 +70,7 @@ public class DynamicSet<E> implements Set<E> {
      */
     @Override
     public int size() {
-        return container.size();
+        return data.size();
     }
 
     /**
@@ -66,7 +80,7 @@ public class DynamicSet<E> implements Set<E> {
      */
     @Override
     public boolean isEmpty() {
-        return container.isEmpty();
+        return data.isEmpty();
     }
 
     /**
@@ -86,7 +100,7 @@ public class DynamicSet<E> implements Set<E> {
      */
     @Override
     public boolean contains(Object o) {
-        return container.contains(o);
+        return data.contains(o);
     }
 
     /**
@@ -98,7 +112,7 @@ public class DynamicSet<E> implements Set<E> {
      */
     @Override
     public Iterator<E> iterator() {
-        return container.iterator();
+        return data.iterator();
     }
 
     /**
@@ -113,14 +127,14 @@ public class DynamicSet<E> implements Set<E> {
      * @throws NullPointerException if the specified action is null
      * @implSpec <p>The default implementation behaves as if:
      * <pre>{@code
-     *     for (T t : this)
-     *         action.accept(t);
+     *     for (T type : this)
+     *         action.accept(type);
      * }</pre>
      * @since 1.8
      */
     @Override
     public void forEach(Consumer<? super E> action) {
-        container.forEach(action);
+        data.forEach(action);
     }
 
     /**
@@ -128,12 +142,12 @@ public class DynamicSet<E> implements Set<E> {
      * If this set makes any guarantees as to what order its elements
      * are returned by its iterator, this method must return the
      * elements in the same order.
-     * <p>
+     * <p/>
      * <p>The returned array will be "safe" in that no references to it
      * are maintained by this set.  (In other words, this method must
      * allocate a new array even if this set is backed by an array).
      * The caller is thus free to modify the returned array.
-     * <p>
+     * <p/>
      * <p>This method acts as bridge between array-based and collection-based
      * APIs.
      *
@@ -141,7 +155,7 @@ public class DynamicSet<E> implements Set<E> {
      */
     @Override
     public Object[] toArray() {
-        return container.toArray();
+        return data.toArray();
     }
 
     /**
@@ -150,30 +164,30 @@ public class DynamicSet<E> implements Set<E> {
      * If the set fits in the specified array, it is returned therein.
      * Otherwise, a new array is allocated with the runtime type of the
      * specified array and the size of this set.
-     * <p>
+     * <p/>
      * <p>If this set fits in the specified array with room to spare
      * (i.e., the array has more elements than this set), the element in
      * the array immediately following the end of the set is set to
      * <tt>null</tt>.  (This is useful in determining the length of this
      * set <i>only</i> if the caller knows that this set does not contain
      * any null elements.)
-     * <p>
+     * <p/>
      * <p>If this set makes any guarantees as to what order its elements
      * are returned by its iterator, this method must return the elements
      * in the same order.
-     * <p>
+     * <p/>
      * <p>Like the {@link #toArray()} method, this method acts as bridge between
      * array-based and collection-based APIs.  Further, this method allows
      * precise control over the runtime type of the output array, and may,
      * under certain circumstances, be used to save allocation costs.
-     * <p>
+     * <p/>
      * <p>Suppose <tt>x</tt> is a set known to contain only strings.
      * The following code can be used to dump the set into a newly allocated
      * array of <tt>String</tt>:
-     * <p>
+     * <p/>
      * <pre>
      *     String[] y = x.toArray(new String[0]);</pre>
-     * <p>
+     * <p/>
      * Note that <tt>toArray(new Object[0])</tt> is identical in function to
      * <tt>toArray()</tt>.
      *
@@ -188,7 +202,7 @@ public class DynamicSet<E> implements Set<E> {
      */
     @Override
     public <T> T[] toArray(T[] a) {
-        return container.toArray(a);
+        return data.toArray(a);
     }
 
     /**
@@ -201,7 +215,7 @@ public class DynamicSet<E> implements Set<E> {
      * unchanged and returns <tt>false</tt>.  In combination with the
      * restriction on constructors, this ensures that sets never contain
      * duplicate elements.
-     * <p>
+     * <p/>
      * <p>The stipulation above does not imply that sets must accept all
      * elements; sets may refuse to add any particular element, including
      * <tt>null</tt>, and throw an exception, as described in the
@@ -223,7 +237,7 @@ public class DynamicSet<E> implements Set<E> {
      */
     @Override
     public boolean add(E e) {
-        return container.add(e);
+        return data.add(e);
     }
 
     /**
@@ -249,7 +263,7 @@ public class DynamicSet<E> implements Set<E> {
      */
     @Override
     public boolean remove(Object o) {
-        return container.remove(o);
+        return data.remove(o);
     }
 
     /**
@@ -273,7 +287,7 @@ public class DynamicSet<E> implements Set<E> {
      */
     @Override
     public boolean containsAll(Collection<?> c) {
-        return container.containsAll(c);
+        return data.containsAll(c);
     }
 
     /**
@@ -299,7 +313,7 @@ public class DynamicSet<E> implements Set<E> {
      */
     @Override
     public boolean addAll(Collection<? extends E> c) {
-        return container.addAll(c);
+        return data.addAll(c);
     }
 
     /**
@@ -325,7 +339,7 @@ public class DynamicSet<E> implements Set<E> {
      */
     @Override
     public boolean retainAll(Collection<?> c) {
-        return container.retainAll(c);
+        return data.retainAll(c);
     }
 
     /**
@@ -351,7 +365,7 @@ public class DynamicSet<E> implements Set<E> {
      */
     @Override
     public boolean removeAll(Collection<?> c) {
-        return container.removeAll(c);
+        return data.removeAll(c);
     }
 
     /**
@@ -376,7 +390,7 @@ public class DynamicSet<E> implements Set<E> {
      */
     @Override
     public boolean removeIf(Predicate<? super E> filter) {
-        return container.removeIf(filter);
+        return data.removeIf(filter);
     }
 
     /**
@@ -388,7 +402,7 @@ public class DynamicSet<E> implements Set<E> {
      */
     @Override
     public void clear() {
-        container.clear();
+        data.clear();
     }
 
     /**
@@ -405,7 +419,7 @@ public class DynamicSet<E> implements Set<E> {
      */
     @Override
     public boolean equals(Object o) {
-        return container.equals(o);
+        return data.equals(o);
     }
 
     /**
@@ -423,12 +437,12 @@ public class DynamicSet<E> implements Set<E> {
      */
     @Override
     public int hashCode() {
-        return container.hashCode();
+        return data.hashCode();
     }
 
     /**
      * Creates a {@code Spliterator} over the elements in this set.
-     * <p>
+     * <p/>
      * <p>The {@code Spliterator} reports {@link Spliterator#DISTINCT}.
      * Implementations should document the reporting of additional
      * characteristic values.
@@ -438,7 +452,7 @@ public class DynamicSet<E> implements Set<E> {
      * <em><a href="Spliterator.html#binding">late-binding</a></em> spliterator
      * from the set's {@code Iterator}.  The spliterator inherits the
      * <em>fail-fast</em> properties of the set's iterator.
-     * <p>
+     * <p/>
      * The created {@code Spliterator} additionally reports
      * {@link Spliterator#SIZED}.
      * @implNote The created {@code Spliterator} additionally reports
@@ -447,12 +461,12 @@ public class DynamicSet<E> implements Set<E> {
      */
     @Override
     public Spliterator<E> spliterator() {
-        return container.spliterator();
+        return data.spliterator();
     }
 
     /**
      * Returns a sequential {@code Stream} with this collection as its source.
-     * <p>
+     * <p/>
      * <p>This method should be overridden when the {@link #spliterator()}
      * method cannot return a spliterator that is {@code IMMUTABLE},
      * {@code CONCURRENT}, or <em>late-binding</em>. (See {@link #spliterator()}
@@ -465,13 +479,13 @@ public class DynamicSet<E> implements Set<E> {
      */
     @Override
     public Stream<E> stream() {
-        return container.stream();
+        return data.stream();
     }
 
     /**
      * Returns a possibly parallel {@code Stream} with this collection as its
      * source.  It is allowable for this method to return a sequential stream.
-     * <p>
+     * <p/>
      * <p>This method should be overridden when the {@link #spliterator()}
      * method cannot return a spliterator that is {@code IMMUTABLE},
      * {@code CONCURRENT}, or <em>late-binding</em>. (See {@link #spliterator()}
@@ -485,7 +499,7 @@ public class DynamicSet<E> implements Set<E> {
      */
     @Override
     public Stream<E> parallelStream() {
-        return container.parallelStream();
+        return data.parallelStream();
     }
 
     public enum SETTYPE {

@@ -1,7 +1,5 @@
 package factories;
 
-import seq.Sequence;
-
 import java.util.Collection;
 
 /**

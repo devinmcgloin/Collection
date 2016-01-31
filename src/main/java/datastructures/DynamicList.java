@@ -12,39 +12,53 @@ import java.util.stream.Stream;
  */
 public class DynamicList<E> implements List<E> {
 
-    private LISTTYPE t;
-    private List<E> container;
+    private LISTTYPE type;
+    private List<E> data;
 
     public DynamicList() {
-        t = LISTTYPE.ARRAYLIST;
-        container = new ArrayList<E>();
+        type = LISTTYPE.ARRAYLIST;
+        data = new ArrayList<E>();
     }
 
-    public DynamicList(LISTTYPE t) {
-        this.t = t;
-        switch (t) {
+    public DynamicList(LISTTYPE type) {
+        this.type = type;
+        switch (type) {
             case ARRAYLIST:
-                container = new LinkedList<E>();
+                data = new LinkedList<E>();
                 break;
             case LINKEDLIST:
-                container = new ArrayList<E>();
+                data = new ArrayList<E>();
                 break;
         }
     }
 
+    public DynamicList(E[] arr) {
+        this();
+        for (E item : arr)
+            add(item);
+    }
+
+    @Override
+    public String toString() {
+        return "DynamicList{" +
+                "type=" + type +
+                ", data=" + data +
+                '}';
+    }
+
     public void convert(LISTTYPE t) {
-        if (this.t == t) {
+        if (this.type == t) {
             return;
         }
         E[] arr;
         switch (t) {
             case ARRAYLIST:
-                arr = (E[])toArray();
-                container = new LinkedList<E>(Arrays.asList(arr));
+                arr = (E[]) toArray();
+                data = new LinkedList<E>(Arrays.asList(arr));
                 break;
             case LINKEDLIST:
-                arr = (E[])toArray();
-                container = new ArrayList<E>(Arrays.asList(arr));
+                arr = (E[]) toArray();
+                data = new ArrayList<E>(Arrays.asList(arr));
                 break;
         }
     }
@@ -61,14 +75,14 @@ public class DynamicList<E> implements List<E> {
      * @throws NullPointerException if the specified action is null
      * @implSpec <p>The default implementation behaves as if:
      * <pre>{@code
-     *     for (T t : this)
-     *         action.accept(t);
+     *     for (T type : this)
+     *         action.accept(type);
      * }</pre>
      * @since 1.8
      */
     @Override
     public void forEach(Consumer<? super E> action) {
-        container.forEach(action);
+        data.forEach(action);
     }
 
     /**
@@ -80,7 +94,7 @@ public class DynamicList<E> implements List<E> {
      */
     @Override
     public int size() {
-        return container.size();
+        return data.size();
     }
 
     /**
@@ -90,7 +104,7 @@ public class DynamicList<E> implements List<E> {
      */
     @Override
     public boolean isEmpty() {
-        return container.isEmpty();
+        return data.isEmpty();
     }
 
     /**
@@ -110,7 +124,7 @@ public class DynamicList<E> implements List<E> {
      */
     @Override
     public boolean contains(Object o) {
-        return container.contains(o);
+        return data.contains(o);
     }
 
     /**
@@ -120,18 +134,18 @@ public class DynamicList<E> implements List<E> {
      */
     @Override
     public Iterator<E> iterator() {
-        return container.iterator();
+        return data.iterator();
     }
 
     /**
      * Returns an array containing all of the elements in this list in proper
      * sequence (from first to last element).
-     * <p>
+     * <p/>
      * <p>The returned array will be "safe" in that no references to it are
      * maintained by this list.  (In other words, this method must
      * allocate a new array even if this list is backed by an array).
      * The caller is thus free to modify the returned array.
-     * <p>
+     * <p/>
      * <p>This method acts as bridge between array-based and collection-based
      * APIs.
      *
@@ -141,7 +155,7 @@ public class DynamicList<E> implements List<E> {
      */
     @Override
     public Object[] toArray() {
-        return container.toArray();
+        return data.toArray();
     }
 
     /**
@@ -151,26 +165,26 @@ public class DynamicList<E> implements List<E> {
      * in the specified array, it is returned therein.  Otherwise, a new
      * array is allocated with the runtime type of the specified array and
      * the size of this list.
-     * <p>
+     * <p/>
      * <p>If the list fits in the specified array with room to spare (i.e.,
      * the array has more elements than the list), the element in the array
      * immediately following the end of the list is set to <tt>null</tt>.
      * (This is useful in determining the length of the list <i>only</i> if
      * the caller knows that the list does not contain any null elements.)
-     * <p>
+     * <p/>
      * <p>Like the {@link #toArray()} method, this method acts as bridge between
      * array-based and collection-based APIs.  Further, this method allows
      * precise control over the runtime type of the output array, and may,
      * under certain circumstances, be used to save allocation costs.
-     * <p>
+     * <p/>
      * <p>Suppose <tt>x</tt> is a list known to contain only strings.
      * The following code can be used to dump the list into a newly
      * allocated array of <tt>String</tt>:
-     * <p>
+     * <p/>
      * <pre>{@code
      *     String[] y = x.toArray(new String[0]);
      * }</pre>
-     * <p>
+     * <p/>
      * Note that <tt>toArray(new Object[0])</tt> is identical in function to
      * <tt>toArray()</tt>.
      *
@@ -185,13 +199,13 @@ public class DynamicList<E> implements List<E> {
      */
     @Override
     public <T> T[] toArray(T[] a) {
-        return container.toArray(a);
+        return data.toArray(a);
     }
 
     /**
      * Appends the specified element to the end of this list (optional
      * operation).
-     * <p>
+     * <p/>
      * <p>Lists that support this operation may place limitations on what
      * elements may be added to this list.  In particular, some
      * lists will refuse to add null elements, and others will impose
@@ -212,7 +226,7 @@ public class DynamicList<E> implements List<E> {
      */
     @Override
     public boolean add(E e) {
-        return container.add(e);
+        return data.add(e);
     }
 
     /**
@@ -238,7 +252,7 @@ public class DynamicList<E> implements List<E> {
      */
     @Override
     public boolean remove(Object o) {
-        return container.remove(o);
+        return data.remove(o);
     }
 
     /**
@@ -261,7 +275,7 @@ public class DynamicList<E> implements List<E> {
      */
     @Override
     public boolean containsAll(Collection<?> c) {
-        return container.containsAll(c);
+        return data.containsAll(c);
     }
 
     /**
@@ -287,7 +301,7 @@ public class DynamicList<E> implements List<E> {
      */
     @Override
     public boolean addAll(Collection<? extends E> c) {
-        return container.addAll(c);
+        return data.addAll(c);
     }
 
     /**
@@ -319,7 +333,7 @@ public class DynamicList<E> implements List<E> {
      */
     @Override
     public boolean addAll(int index, Collection<? extends E> c) {
-        return container.addAll(index, c);
+        return data.addAll(index, c);
     }
 
     /**
@@ -342,7 +356,7 @@ public class DynamicList<E> implements List<E> {
      */
     @Override
     public boolean removeAll(Collection<?> c) {
-        return container.removeAll(c);
+        return data.removeAll(c);
     }
 
     /**
@@ -367,7 +381,7 @@ public class DynamicList<E> implements List<E> {
      */
     @Override
     public boolean retainAll(Collection<?> c) {
-        return container.retainAll(c);
+        return data.retainAll(c);
     }
 
     /**
@@ -379,7 +393,7 @@ public class DynamicList<E> implements List<E> {
      */
     @Override
     public void clear() {
-        container.clear();
+        data.clear();
     }
 
     /**
@@ -392,7 +406,7 @@ public class DynamicList<E> implements List<E> {
      */
     @Override
     public E get(int index) {
-        return container.get(index);
+        return data.get(index);
     }
 
     /**
@@ -415,7 +429,7 @@ public class DynamicList<E> implements List<E> {
      */
     @Override
     public E set(int index, E element) {
-        return container.set(index, element);
+        return data.set(index, element);
     }
 
     /**
@@ -439,7 +453,7 @@ public class DynamicList<E> implements List<E> {
      */
     @Override
     public void add(int index, E element) {
-        container.add(index, element);
+        data.add(index, element);
     }
 
     /**
@@ -457,7 +471,7 @@ public class DynamicList<E> implements List<E> {
      */
     @Override
     public E remove(int index) {
-        return container.remove(index);
+        return data.remove(index);
     }
 
     /**
@@ -479,7 +493,7 @@ public class DynamicList<E> implements List<E> {
      */
     @Override
     public int indexOf(Object o) {
-        return container.indexOf(o);
+        return data.indexOf(o);
     }
 
     /**
@@ -501,7 +515,7 @@ public class DynamicList<E> implements List<E> {
      */
     @Override
     public int lastIndexOf(Object o) {
-        return container.lastIndexOf(o);
+        return data.lastIndexOf(o);
     }
 
     /**
@@ -513,7 +527,7 @@ public class DynamicList<E> implements List<E> {
      */
     @Override
     public ListIterator<E> listIterator() {
-        return container.listIterator();
+        return data.listIterator();
     }
 
     /**
@@ -533,7 +547,7 @@ public class DynamicList<E> implements List<E> {
      */
     @Override
     public ListIterator<E> listIterator(int index) {
-        return container.listIterator(index);
+        return data.listIterator(index);
     }
 
     /**
@@ -544,7 +558,7 @@ public class DynamicList<E> implements List<E> {
      * changes in the returned list are reflected in this list, and vice-versa.
      * The returned list supports all of the optional list operations supported
      * by this list.<p>
-     * <p>
+     * <p/>
      * This method eliminates the need for explicit range operations (of
      * the sort that commonly exist for arrays).  Any operation that expects
      * a list can be used as a range operation by passing a subList view
@@ -556,7 +570,7 @@ public class DynamicList<E> implements List<E> {
      * Similar idioms may be constructed for <tt>indexOf</tt> and
      * <tt>lastIndexOf</tt>, and all of the algorithms in the
      * <tt>Collections</tt> class can be applied to a subList.<p>
-     * <p>
+     * <p/>
      * The semantics of the list returned by this method become undefined if
      * the backing list (i.e., this list) is <i>structurally modified</i> in
      * any way other than via the returned list.  (Structural modifications are
@@ -572,7 +586,7 @@ public class DynamicList<E> implements List<E> {
      */
     @Override
     public List<E> subList(int fromIndex, int toIndex) {
-        return container.subList(fromIndex, toIndex);
+        return data.subList(fromIndex, toIndex);
     }
 
     /**
@@ -596,7 +610,7 @@ public class DynamicList<E> implements List<E> {
      *         li.set(operator.apply(li.next()));
      *     }
      * }</pre>
-     * <p>
+     * <p/>
      * If the list's list-iterator does not support the {@code set} operation
      * then an {@code UnsupportedOperationException} will be thrown when
      * replacing the first element.
@@ -604,22 +618,22 @@ public class DynamicList<E> implements List<E> {
      */
     @Override
     public void replaceAll(UnaryOperator<E> operator) {
-        container.replaceAll(operator);
+        data.replaceAll(operator);
     }
 
     /**
      * Sorts this list according to the order induced by the specified
      * {@link Comparator}.
-     * <p>
+     * <p/>
      * <p>All elements in this list must be <i>mutually comparable</i> using the
      * specified comparator (that is, {@code c.compare(e1, e2)} must not throw
      * a {@code ClassCastException} for any elements {@code e1} and {@code e2}
      * in the list).
-     * <p>
+     * <p/>
      * <p>If the specified comparator is {@code null} then all elements in this
      * list must implement the {@link Comparable} interface and the elements'
      * {@linkplain Comparable natural ordering} should be used.
-     * <p>
+     * <p/>
      * <p>This list must be modifiable, but need not be resizable.
      *
      * @param c the {@code Comparator} used to compare list elements.
@@ -645,13 +659,13 @@ public class DynamicList<E> implements List<E> {
      * comparisons.  Temporary storage requirements vary from a small constant
      * for nearly sorted input arrays to n/2 object references for randomly
      * ordered input arrays.
-     * <p>
+     * <p/>
      * <p>The implementation takes equal advantage of ascending and
      * descending order in its input array, and can take advantage of
      * ascending and descending order in different parts of the same
      * input array.  It is well-suited to merging two or more sorted arrays:
      * simply concatenate the arrays and sort the resulting array.
-     * <p>
+     * <p/>
      * <p>The implementation was adapted from Tim Peters's list sort for Python
      * (<a href="http://svn.python.org/projects/python/trunk/Objects/listsort.txt">
      * TimSort</a>).  It uses techniques from Peter McIlroy's "Optimistic
@@ -662,12 +676,12 @@ public class DynamicList<E> implements List<E> {
      */
     @Override
     public void sort(Comparator<? super E> c) {
-        container.sort(c);
+        data.sort(c);
     }
 
     /**
      * Creates a {@link Spliterator} over the elements in this list.
-     * <p>
+     * <p/>
      * <p>The {@code Spliterator} reports {@link Spliterator#SIZED} and
      * {@link Spliterator#ORDERED}.  Implementations should document the
      * reporting of additional characteristic values.
@@ -683,7 +697,7 @@ public class DynamicList<E> implements List<E> {
      */
     @Override
     public Spliterator<E> spliterator() {
-        return container.spliterator();
+        return data.spliterator();
     }
 
     /**
@@ -708,12 +722,12 @@ public class DynamicList<E> implements List<E> {
      */
     @Override
     public boolean removeIf(Predicate<? super E> filter) {
-        return container.removeIf(filter);
+        return data.removeIf(filter);
     }
 
     /**
      * Returns a sequential {@code Stream} with this collection as its source.
-     * <p>
+     * <p/>
      * <p>This method should be overridden when the {@link #spliterator()}
      * method cannot return a spliterator that is {@code IMMUTABLE},
      * {@code CONCURRENT}, or <em>late-binding</em>. (See {@link #spliterator()}
@@ -726,13 +740,13 @@ public class DynamicList<E> implements List<E> {
      */
     @Override
     public Stream<E> stream() {
-        return container.stream();
+        return data.stream();
     }
 
     /**
      * Returns a possibly parallel {@code Stream} with this collection as its
      * source.  It is allowable for this method to return a sequential stream.
-     * <p>
+     * <p/>
      * <p>This method should be overridden when the {@link #spliterator()}
      * method cannot return a spliterator that is {@code IMMUTABLE},
      * {@code CONCURRENT}, or <em>late-binding</em>. (See {@link #spliterator()}
@@ -746,7 +760,7 @@ public class DynamicList<E> implements List<E> {
      */
     @Override
     public Stream<E> parallelStream() {
-        return container.parallelStream();
+        return data.parallelStream();
     }
 
     public enum LISTTYPE {
