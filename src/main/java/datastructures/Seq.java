@@ -1,8 +1,10 @@
 package datastructures;
 
+import funct.DatedComparator;
 import funct.Functor;
 import funct.Ranker;
 import funct.Reductor;
+import stats.Recommender;
 
 import java.util.*;
 import java.util.function.Consumer;
@@ -17,12 +19,13 @@ import java.util.stream.Stream;
  * <p/>
  * Seq also allows for map, filter, reduce operations, as well as grouping by a field, and getting subsets.
  */
-public class Seq<E> implements Collection<E> {
+public class Seq<E> implements Collection<E>, ISeq<E> {
 
     final boolean locked;
     TYPE type;
-    Comparator<E> cmp = null;
-    private Collection<E> collection;
+    DatedComparator<E> cmp = null;
+    private ISeq<E> collection;
+    private Recommender rec;
 
     public Seq() {
         this(TYPE.SET, false);
@@ -33,6 +36,7 @@ public class Seq<E> implements Collection<E> {
     }
 
     public Seq(TYPE type, boolean locked) {
+        rec = new Recommender();
         switch (type) {
             case SET:
                 collection = new DynamicSet<E>();
@@ -48,16 +52,45 @@ public class Seq<E> implements Collection<E> {
         this.type = type;
     }
 
+    @Override
+    public E get(final int i) {
+        if (i == 0)
+            rec.inc(Recommender.SeqOp.FIRST);
+        else if (i == size() - 1)
+            rec.inc(Recommender.SeqOp.LAST);
+        else
+            rec.inc(Recommender.SeqOp.MIDDLE);
+        return collection.get(i);
+    }
+
+    @Override
+    public E remove(final int i) {
+        if (i == 0)
+            rec.inc(Recommender.SeqOp.FIRST);
+        else if (i == size() - 1)
+            rec.inc(Recommender.SeqOp.LAST);
+        else
+            rec.inc(Recommender.SeqOp.MIDDLE);
+        rec.decSize(1);
+        return collection.remove(i);
+    }
+
     public void search(Ranker<E> ranker) {
-        Comparator<E> cmp = (o1, o2) -> (int) Math.floor(ranker.apply(o2) - ranker.apply(o1));
+        DatedComparator<E> cmp = new DatedComparator<E>() {
+            @Override
+            public int compare(E o1, E o2) {
+                return (int) Math.floor(ranker.apply(o2) - ranker.apply(o1));
+            }
+        };
         this.cmp = cmp;
         convert(TYPE.QUEUE);
     }
 
-    public void sort(Comparator<E> cmp) {
+    public void sort(DatedComparator<E> cmp) {
         convert(TYPE.LIST);
         DynamicList<E> list = (DynamicList<E>) collection;
         list.sort(cmp);
+        this.cmp = cmp;
     }
 
     /**
@@ -175,6 +208,7 @@ public class Seq<E> implements Collection<E> {
      */
     @Override
     public boolean contains(Object o) {
+        rec.inc(Recommender.SeqOp.MEMBERSHIP);
         return collection.contains(o);
     }
 
@@ -294,6 +328,7 @@ public class Seq<E> implements Collection<E> {
      */
     @Override
     public boolean add(E e) {
+        rec.incSize(1);
         return collection.add(e);
     }
 
@@ -319,6 +354,7 @@ public class Seq<E> implements Collection<E> {
      */
     @Override
     public boolean remove(Object o) {
+        rec.decSize(1);
         return collection.remove(o);
     }
 
@@ -342,6 +378,7 @@ public class Seq<E> implements Collection<E> {
      */
     @Override
     public boolean containsAll(Collection<?> c) {
+        rec.inc(Recommender.SeqOp.MEMBERSHIP);
         return collection.containsAll(c);
     }
 
@@ -371,6 +408,7 @@ public class Seq<E> implements Collection<E> {
      */
     @Override
     public boolean addAll(Collection<? extends E> c) {
+        rec.incSize(c.size());
         return collection.addAll(c);
     }
 
@@ -399,6 +437,7 @@ public class Seq<E> implements Collection<E> {
      */
     @Override
     public boolean removeAll(Collection<?> c) {
+        rec.decSize(c.size());
         return collection.removeAll(c);
     }
 
@@ -463,6 +502,7 @@ public class Seq<E> implements Collection<E> {
      */
     @Override
     public void clear() {
+        rec.clearSize();
         collection.clear();
     }
 
@@ -681,7 +721,6 @@ public class Seq<E> implements Collection<E> {
         }
         return col;
     }
-
 
     public enum TYPE {
         SET, LIST, QUEUE

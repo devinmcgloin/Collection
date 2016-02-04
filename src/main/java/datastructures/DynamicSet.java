@@ -8,7 +8,7 @@ import java.util.stream.Stream;
 /**
  * Created by devinmcgloin on 1/25/16.
  */
-public class DynamicSet<E> implements Set<E> {
+public class DynamicSet<E> implements Set<E>, ISeq<E> {
 
     private SETTYPE type;
     private Set<E> data;
@@ -32,6 +32,12 @@ public class DynamicSet<E> implements Set<E> {
 
     public DynamicSet(E[] arr) {
         this();
+        for (E item : arr)
+            add(item);
+    }
+
+    public DynamicSet(E[] arr, SETTYPE t) {
+        this(t);
         for (E item : arr)
             add(item);
     }
@@ -203,6 +209,31 @@ public class DynamicSet<E> implements Set<E> {
     @Override
     public <T> T[] toArray(T[] a) {
         return data.toArray(a);
+    }
+
+    @Override
+    public E get(final int i) {
+        int j = 0;
+        for (E item : data) {
+            if (j == i)
+                return item;
+            j++;
+        }
+        return null;
+    }
+
+    @Override
+    public E remove(final int i) {
+        int j = 0;
+        for (E item : data) {
+            if (j == i) {
+                E cop = item;
+                data.remove(item);
+                return cop;
+            }
+            j++;
+        }
+        return null;
     }
 
     /**

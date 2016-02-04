@@ -1,6 +1,7 @@
 package seq;
 
 import datastructures.Seq;
+import funct.DatedComparator;
 import funct.Ranker;
 
 /**
@@ -31,16 +32,23 @@ public class MessAbout {
         data.search(ranker);
         System.out.println(data);
 
-        for (String s : data) {
-            System.out.printf("%2d %4s\n", (int) Math.floor(ranker.apply(s)), s);
-        }
-        data.sort((o1, o2) -> (int) Math.floor(ranker.apply(o2) - ranker.apply(o1)));
+        data.sort(new DatedComparator<String>() {
+            @Override
+            public int compare(String o1, String o2) {
+                return (int) Math.floor(ranker.apply(o2) - ranker.apply(o1));
+            }
+        });
         System.out.println(data);
 
         data.filter(s -> s.startsWith("10"));
         System.out.println(data);
         System.out.println(data.contains("101"));
         System.out.println(data);
+        populate(3, "");
+        System.out.println(data);
+        Seq<String> newSeq = new Seq<>();
+        newSeq.addAll(data);
+        System.out.println(newSeq);
     }
 
     private static void populate(int len, String primer) {

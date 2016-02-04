@@ -8,7 +8,7 @@ import java.util.stream.Stream;
 /**
  * Created by devinmcgloin on 1/25/16.
  */
-public class DynamicQueue<E> implements Queue<E> {
+public class DynamicQueue<E> implements Queue<E>, ISeq<E> {
 
     private Queue<E> data;
     private QUEUETYPE type;
@@ -59,6 +59,31 @@ public class DynamicQueue<E> implements Queue<E> {
                 "type=" + type +
                 ", data=" + data +
                 '}';
+    }
+
+    @Override
+    public E get(final int i) {
+        int j = 0;
+        for (E item : data) {
+            if (j == i)
+                return item;
+            j++;
+        }
+        return null;
+    }
+
+    @Override
+    public E remove(final int i) {
+        int j = 0;
+        for (E item : data) {
+            if (j == i) {
+                E cop = item;
+                data.remove(item);
+                return cop;
+            }
+            j++;
+        }
+        return null;
     }
 
     /**

@@ -10,7 +10,7 @@ import java.util.stream.Stream;
  * Created by devinmcgloin on 1/25/16.
  * Dynamic Lists are backed by either an arraylist or an lnked list.
  */
-public class DynamicList<E> implements List<E> {
+public class DynamicList<E> implements List<E>, ISeq<E> {
 
     private LISTTYPE type;
     private List<E> data;
@@ -34,6 +34,12 @@ public class DynamicList<E> implements List<E> {
 
     public DynamicList(E[] arr) {
         this();
+        for (E item : arr)
+            add(item);
+    }
+
+    public DynamicList(E[] arr, LISTTYPE t) {
+        this(t);
         for (E item : arr)
             add(item);
     }
