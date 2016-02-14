@@ -1,5 +1,7 @@
 package datastructures;
 
+import seq.SeqType;
+
 import java.util.*;
 import java.util.function.Consumer;
 import java.util.function.Predicate;
@@ -8,17 +10,17 @@ import java.util.stream.Stream;
 /**
  * Created by devinmcgloin on 1/25/16.
  */
-public class DynamicSet<E> implements Set<E> {
+public class DynamicSet<E> implements Set<E>, ISeq<E> {
 
-    private SETTYPE type;
+    private SeqType type;
     private Set<E> data;
 
     public DynamicSet() {
-        type = SETTYPE.HASHSET;
+        type = SeqType.HASHSET;
         data = new HashSet<>();
     }
 
-    public DynamicSet(SETTYPE type) {
+    public DynamicSet(SeqType type) {
         this.type = type;
         switch (type) {
             case HASHSET:
@@ -36,6 +38,12 @@ public class DynamicSet<E> implements Set<E> {
             add(item);
     }
 
+    public DynamicSet(E[] arr, SeqType t) {
+        this(t);
+        for (E item : arr)
+            add(item);
+    }
+
     @Override
     public String toString() {
         return "DynamicSet{" +
@@ -44,7 +52,7 @@ public class DynamicSet<E> implements Set<E> {
                 '}';
     }
 
-    public void convert(SETTYPE t) {
+    public void convert(SeqType t) {
         if (this.type == t) {
             return;
         }
@@ -203,6 +211,31 @@ public class DynamicSet<E> implements Set<E> {
     @Override
     public <T> T[] toArray(T[] a) {
         return data.toArray(a);
+    }
+
+    @Override
+    public E get(final int i) {
+        int j = 0;
+        for (E item : data) {
+            if (j == i)
+                return item;
+            j++;
+        }
+        return null;
+    }
+
+    @Override
+    public E remove(final int i) {
+        int j = 0;
+        for (E item : data) {
+            if (j == i) {
+                E cop = item;
+                data.remove(item);
+                return cop;
+            }
+            j++;
+        }
+        return null;
     }
 
     /**
@@ -500,9 +533,5 @@ public class DynamicSet<E> implements Set<E> {
     @Override
     public Stream<E> parallelStream() {
         return data.parallelStream();
-    }
-
-    public enum SETTYPE {
-        HASHSET, TREESET
     }
 }

@@ -1,5 +1,7 @@
 package datastructures;
 
+import seq.SeqType;
+
 import java.util.*;
 import java.util.function.Consumer;
 import java.util.function.Predicate;
@@ -8,24 +10,29 @@ import java.util.stream.Stream;
 /**
  * Created by devinmcgloin on 1/25/16.
  */
-public class DynamicQueue<E> implements Queue<E> {
+public class DynamicQueue<E> implements Queue<E>, ISeq<E> {
 
     private Queue<E> data;
-    private QUEUETYPE type;
+    private SeqType type;
 
     public DynamicQueue() {
         data = new PriorityQueue<>();
-        type = QUEUETYPE.PRIORITYQUEUE;
+        type = SeqType.PRIORITYQUEUE;
     }
 
     public DynamicQueue(Comparator<E> cmp, E[] arr) {
         data = new PriorityQueue<>(cmp);
-        type = QUEUETYPE.PRIORITYQUEUE;
+        type = SeqType.PRIORITYQUEUE;
         for (E item : arr)
             add(item);
     }
 
-    public DynamicQueue(QUEUETYPE type) {
+    public DynamicQueue(Comparator<E> cmp) {
+        data = new PriorityQueue<>(cmp);
+        type = SeqType.PRIORITYQUEUE;
+    }
+
+    public DynamicQueue(SeqType type) {
         this.type = type;
         switch (type) {
             case PRIORITYQUEUE:
@@ -40,7 +47,7 @@ public class DynamicQueue<E> implements Queue<E> {
             add(item);
     }
 
-    public void convert(QUEUETYPE t) {
+    public void convert(SeqType t) {
         if (this.type == t) {
             return;
         }
@@ -59,6 +66,31 @@ public class DynamicQueue<E> implements Queue<E> {
                 "type=" + type +
                 ", data=" + data +
                 '}';
+    }
+
+    @Override
+    public E get(final int i) {
+        int j = 0;
+        for (E item : data) {
+            if (j == i)
+                return item;
+            j++;
+        }
+        return null;
+    }
+
+    @Override
+    public E remove(final int i) {
+        int j = 0;
+        for (E item : data) {
+            if (j == i) {
+                E cop = item;
+                data.remove(item);
+                return cop;
+            }
+            j++;
+        }
+        return null;
     }
 
     /**
@@ -555,9 +587,5 @@ public class DynamicQueue<E> implements Queue<E> {
     @Override
     public void forEach(Consumer<? super E> action) {
         data.forEach(action);
-    }
-
-    public enum QUEUETYPE {
-        PRIORITYQUEUE
     }
 }

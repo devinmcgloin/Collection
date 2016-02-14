@@ -1,5 +1,7 @@
 package datastructures;
 
+import seq.SeqType;
+
 import java.util.*;
 import java.util.function.Consumer;
 import java.util.function.Predicate;
@@ -10,23 +12,23 @@ import java.util.stream.Stream;
  * Created by devinmcgloin on 1/25/16.
  * Dynamic Lists are backed by either an arraylist or an lnked list.
  */
-public class DynamicList<E> implements List<E> {
+public class DynamicList<E> implements List<E>, ISeq<E> {
 
-    private LISTTYPE type;
+    private SeqType type;
     private List<E> data;
 
     public DynamicList() {
-        type = LISTTYPE.ARRAYLIST;
+        type = SeqType.ARRAYLIST;
         data = new ArrayList<E>();
     }
 
-    public DynamicList(LISTTYPE type) {
+    public DynamicList(SeqType type) {
         this.type = type;
         switch (type) {
-            case ARRAYLIST:
+            case LINKEDLIST:
                 data = new LinkedList<E>();
                 break;
-            case LINKEDLIST:
+            case ARRAYLIST:
                 data = new ArrayList<E>();
                 break;
         }
@@ -34,6 +36,12 @@ public class DynamicList<E> implements List<E> {
 
     public DynamicList(E[] arr) {
         this();
+        for (E item : arr)
+            add(item);
+    }
+
+    public DynamicList(E[] arr, SeqType t) {
+        this(t);
         for (E item : arr)
             add(item);
     }
@@ -46,7 +54,7 @@ public class DynamicList<E> implements List<E> {
                 '}';
     }
 
-    public void convert(LISTTYPE t) {
+    public void convert(SeqType t) {
         if (this.type == t) {
             return;
         }
@@ -453,6 +461,13 @@ public class DynamicList<E> implements List<E> {
      */
     @Override
     public void add(int index, E element) {
+        if (type == SeqType.LINKEDLIST) {
+            LinkedList<E> ll = (LinkedList<E>) data;
+            if (index == 0)
+                ll.addFirst(element);
+            else if (index == size() - 1)
+                ll.addLast(element);
+        }
         data.add(index, element);
     }
 
@@ -471,6 +486,13 @@ public class DynamicList<E> implements List<E> {
      */
     @Override
     public E remove(int index) {
+        if (type == SeqType.LINKEDLIST) {
+            LinkedList<E> ll = (LinkedList<E>) data;
+            if (index == 0)
+                return ll.removeFirst();
+            else if (index == size() - 1)
+                return ll.removeFirst();
+        }
         return data.remove(index);
     }
 
@@ -761,9 +783,5 @@ public class DynamicList<E> implements List<E> {
     @Override
     public Stream<E> parallelStream() {
         return data.parallelStream();
-    }
-
-    public enum LISTTYPE {
-        ARRAYLIST, LINKEDLIST
     }
 }

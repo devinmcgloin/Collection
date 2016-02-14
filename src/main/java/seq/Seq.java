@@ -1,8 +1,14 @@
-package datastructures;
+package seq;
 
+import datastructures.DynamicList;
+import datastructures.DynamicQueue;
+import datastructures.DynamicSet;
+import datastructures.ISeq;
+import funct.DatedComparator;
 import funct.Functor;
 import funct.Ranker;
 import funct.Reductor;
+import stats.Recommender;
 
 import java.util.*;
 import java.util.function.Consumer;
@@ -17,47 +23,92 @@ import java.util.stream.Stream;
  * <p/>
  * Seq also allows for map, filter, reduce operations, as well as grouping by a field, and getting subsets.
  */
-public class Seq<E> implements Collection<E> {
+public class Seq<E> implements Collection<E>, ISeq<E> {
 
     final boolean locked;
-    TYPE type;
-    Comparator<E> cmp = null;
-    private Collection<E> collection;
+    SeqType type;
+    DatedComparator<E> cmp = null;
+    private ISeq<E> collection;
+    private Recommender rec;
 
     public Seq() {
-        this(TYPE.SET, false);
+        this(SeqType.HASHSET, false);
     }
 
-    public Seq(TYPE type) {
+    public Seq(SeqType type) {
         this(type, false);
     }
 
-    public Seq(TYPE type, boolean locked) {
+    public Seq(SeqType type, boolean locked) {
+        rec = new Recommender();
         switch (type) {
-            case SET:
-                collection = new DynamicSet<E>();
+            case TREESET:
+                collection = new DynamicSet<>(SeqType.TREESET);
+                type = SeqType.TREESET;
                 break;
-            case LIST:
-                collection = new DynamicList<E>();
+            case HASHSET:
+                collection = new DynamicSet<>(SeqType.HASHSET);
+                type = SeqType.HASHSET;
                 break;
-            case QUEUE:
-                collection = new DynamicQueue<E>();
+            case LINKEDLIST:
+                collection = new DynamicList<>(SeqType.LINKEDLIST);
+                type = SeqType.LINKEDLIST;
+                break;
+            case ARRAYLIST:
+                collection = new DynamicList<>(SeqType.ARRAYLIST);
+                type = SeqType.ARRAYLIST;
+                break;
+            case PRIORITYQUEUE:
+                type = SeqType.PRIORITYQUEUE;
+                if (cmp != null)
+                    collection = new DynamicQueue<>(cmp);
+                else
+                    collection = new DynamicQueue<>();
                 break;
         }
         this.locked = locked;
         this.type = type;
     }
 
-    public void search(Ranker<E> ranker) {
-        Comparator<E> cmp = (o1, o2) -> (int) Math.floor(ranker.apply(o2) - ranker.apply(o1));
-        this.cmp = cmp;
-        convert(TYPE.QUEUE);
+    @Override
+    public E get(final int i) {
+        if (i == 0)
+            rec.inc(SeqOp.FIRST);
+        else if (i == size() - 1)
+            rec.inc(SeqOp.LAST);
+        else
+            rec.inc(SeqOp.MIDDLE);
+        return collection.get(i);
     }
 
-    public void sort(Comparator<E> cmp) {
-        convert(TYPE.LIST);
+    @Override
+    public E remove(final int i) {
+        if (i == 0)
+            rec.inc(SeqOp.FIRST);
+        else if (i == size() - 1)
+            rec.inc(SeqOp.LAST);
+        else
+            rec.inc(SeqOp.MIDDLE);
+        rec.decSize(1);
+        return collection.remove(i);
+    }
+
+    public void search(Ranker<E> ranker) {
+        DatedComparator<E> cmp = new DatedComparator<E>() {
+            @Override
+            public int compare(E o1, E o2) {
+                return (int) Math.floor(ranker.apply(o2) - ranker.apply(o1));
+            }
+        };
+        this.cmp = cmp;
+        convert(SeqType.PRIORITYQUEUE);
+    }
+
+    public void sort(DatedComparator<E> cmp) {
+        convert(SeqType.ARRAYLIST);
         DynamicList<E> list = (DynamicList<E>) collection;
         list.sort(cmp);
+        this.cmp = cmp;
     }
 
     /**
@@ -90,21 +141,34 @@ public class Seq<E> implements Collection<E> {
         removeIf(predicate.negate());
     }
 
-    private void convert(TYPE t) {
+    public void convert(SeqType t) {
         if (locked || this.type == t)
             return;
         E[] arr;
         switch (t) {
-            case SET:
+            case TREESET:
                 arr = (E[]) toArray();
-                collection = new DynamicSet<>(arr);
+                collection = new DynamicSet<>(arr, SeqType.TREESET);
+                type = SeqType.TREESET;
                 break;
-            case LIST:
+            case HASHSET:
                 arr = (E[]) toArray();
-                collection = new DynamicList<>(arr);
+                collection = new DynamicSet<>(arr, SeqType.HASHSET);
+                type = SeqType.HASHSET;
                 break;
-            case QUEUE:
+            case LINKEDLIST:
                 arr = (E[]) toArray();
+                collection = new DynamicList<>(arr, SeqType.LINKEDLIST);
+                type = SeqType.LINKEDLIST;
+                break;
+            case ARRAYLIST:
+                arr = (E[]) toArray();
+                collection = new DynamicList<>(arr, SeqType.ARRAYLIST);
+                type = SeqType.ARRAYLIST;
+                break;
+            case PRIORITYQUEUE:
+                arr = (E[]) toArray();
+                type = SeqType.PRIORITYQUEUE;
                 if (cmp != null)
                     collection = new DynamicQueue<>(cmp, arr);
                 else
@@ -175,6 +239,7 @@ public class Seq<E> implements Collection<E> {
      */
     @Override
     public boolean contains(Object o) {
+        rec.inc(SeqOp.MEMBERSHIP);
         return collection.contains(o);
     }
 
@@ -294,6 +359,7 @@ public class Seq<E> implements Collection<E> {
      */
     @Override
     public boolean add(E e) {
+        rec.incSize(1);
         return collection.add(e);
     }
 
@@ -319,6 +385,7 @@ public class Seq<E> implements Collection<E> {
      */
     @Override
     public boolean remove(Object o) {
+        rec.decSize(1);
         return collection.remove(o);
     }
 
@@ -342,6 +409,7 @@ public class Seq<E> implements Collection<E> {
      */
     @Override
     public boolean containsAll(Collection<?> c) {
+        rec.inc(SeqOp.MEMBERSHIP);
         return collection.containsAll(c);
     }
 
@@ -371,6 +439,7 @@ public class Seq<E> implements Collection<E> {
      */
     @Override
     public boolean addAll(Collection<? extends E> c) {
+        rec.incSize(c.size());
         return collection.addAll(c);
     }
 
@@ -399,6 +468,7 @@ public class Seq<E> implements Collection<E> {
      */
     @Override
     public boolean removeAll(Collection<?> c) {
+        rec.decSize(c.size());
         return collection.removeAll(c);
     }
 
@@ -463,6 +533,7 @@ public class Seq<E> implements Collection<E> {
      */
     @Override
     public void clear() {
+        rec.clearSize();
         collection.clear();
     }
 
@@ -680,10 +751,5 @@ public class Seq<E> implements Collection<E> {
             col.add(item);
         }
         return col;
-    }
-
-
-    public enum TYPE {
-        SET, LIST, QUEUE
     }
 }

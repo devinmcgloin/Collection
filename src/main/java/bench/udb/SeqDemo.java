@@ -1,12 +1,16 @@
-package seq;
+package bench.udb;
 
-import datastructures.Seq;
+import bench.ContentGen;
+import funct.DatedComparator;
 import funct.Ranker;
+import seq.Seq;
+import seq.SeqType;
 
 /**
- * Created by devinmcgloin on 1/29/16.
+ * @author devinmcgloin
+ * @version 2/3/16.
  */
-public class MessAbout {
+public class SeqDemo {
 
     private static Seq<String> data;
 
@@ -22,38 +26,30 @@ public class MessAbout {
 
         data = new Seq<>();
 
-        populate(3, "");
+        ContentGen.populate(data, 3, "");
         System.out.println(data);
         data.filter(s -> s.startsWith("10"));
         System.out.println(data);
 
-        populate(3, "");
+        ContentGen.populate(data, 3, "");
         data.search(ranker);
         System.out.println(data);
 
-        for (String s : data) {
-            System.out.printf("%2d %4s\n", (int) Math.floor(ranker.apply(s)), s);
-        }
-        data.sort((o1, o2) -> (int) Math.floor(ranker.apply(o2) - ranker.apply(o1)));
+        data.sort(new DatedComparator<String>() {
+            @Override
+            public int compare(String o1, String o2) {
+                return (int) Math.floor(ranker.apply(o2) - ranker.apply(o1));
+            }
+        });
         System.out.println(data);
 
         data.filter(s -> s.startsWith("10"));
         System.out.println(data);
+        ContentGen.populate(data, 3, "");
         System.out.println(data.contains("101"));
+        data.add("001");
         System.out.println(data);
-    }
-
-    private static void populate(int len, String primer) {
-        if (primer.length() == len)
-            data.add(primer);
-        else {
-            populate(len, primer + "0");
-            populate(len, primer + "1");
-        }
-
-    }
-
-    private static void randOps() {
-
+        data.convert(SeqType.HASHSET);
+        System.out.println(data);
     }
 }

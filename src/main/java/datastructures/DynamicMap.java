@@ -13,6 +13,8 @@ import java.util.function.Function;
  */
 public class DynamicMap<K, V> implements Map<K, V> {
 
+    Map<K, V> data;
+
     /**
      * If the specified key is not already associated with a value or is
      * associated with null, associates it with the given non-null value.
