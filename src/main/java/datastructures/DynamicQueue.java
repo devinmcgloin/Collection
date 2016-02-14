@@ -27,6 +27,11 @@ public class DynamicQueue<E> implements Queue<E>, ISeq<E> {
             add(item);
     }
 
+    public DynamicQueue(Comparator<E> cmp) {
+        data = new PriorityQueue<>(cmp);
+        type = SeqType.PRIORITYQUEUE;
+    }
+
     public DynamicQueue(SeqType type) {
         this.type = type;
         switch (type) {

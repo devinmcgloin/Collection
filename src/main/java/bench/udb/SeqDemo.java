@@ -1,8 +1,10 @@
 package bench.udb;
 
+import bench.ContentGen;
 import funct.DatedComparator;
 import funct.Ranker;
 import seq.Seq;
+import seq.SeqType;
 
 /**
  * @author devinmcgloin
@@ -24,12 +26,12 @@ public class SeqDemo {
 
         data = new Seq<>();
 
-        populate(3, "");
+        ContentGen.populate(data, 3, "");
         System.out.println(data);
         data.filter(s -> s.startsWith("10"));
         System.out.println(data);
 
-        populate(3, "");
+        ContentGen.populate(data, 3, "");
         data.search(ranker);
         System.out.println(data);
 
@@ -43,25 +45,11 @@ public class SeqDemo {
 
         data.filter(s -> s.startsWith("10"));
         System.out.println(data);
-        populate(3, "");
+        ContentGen.populate(data, 3, "");
         System.out.println(data.contains("101"));
         data.add("001");
         System.out.println(data);
-        data.convert(Seq.TYPE.SET);
+        data.convert(SeqType.HASHSET);
         System.out.println(data);
-    }
-
-    private static void populate(int len, String primer) {
-        if (primer.length() == len)
-            data.add(primer);
-        else {
-            populate(len, primer + "0");
-            populate(len, primer + "1");
-        }
-
-    }
-
-    private static void randOps() {
-
     }
 }

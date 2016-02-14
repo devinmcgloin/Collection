@@ -1,8 +1,8 @@
 package stats;
 
 
-import seq.Seq;
 import seq.SeqOp;
+import seq.SeqType;
 
 import java.util.EnumMap;
 
@@ -12,7 +12,6 @@ import java.util.EnumMap;
 public class Recommender {
 
     EnumMap<SeqOp, Integer> operations;
-    Seq.TYPE last;
 
     public Recommender() {
         operations = new EnumMap<SeqOp, Integer>(SeqOp.class);
@@ -56,8 +55,8 @@ public class Recommender {
         operations.put(SeqOp.SIZE, i);
     }
 
-    public Seq.TYPE reccomend() {
-        return Seq.TYPE.SET;
+    public SeqType reccomend() {
+        return SeqType.HASHSET;
     }
 
 

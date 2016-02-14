@@ -25,10 +25,10 @@ public class DynamicList<E> implements List<E>, ISeq<E> {
     public DynamicList(SeqType type) {
         this.type = type;
         switch (type) {
-            case ARRAYLIST:
+            case LINKEDLIST:
                 data = new LinkedList<E>();
                 break;
-            case LINKEDLIST:
+            case ARRAYLIST:
                 data = new ArrayList<E>();
                 break;
         }
@@ -461,6 +461,13 @@ public class DynamicList<E> implements List<E>, ISeq<E> {
      */
     @Override
     public void add(int index, E element) {
+        if (type == SeqType.LINKEDLIST) {
+            LinkedList<E> ll = (LinkedList<E>) data;
+            if (index == 0)
+                ll.addFirst(element);
+            else if (index == size() - 1)
+                ll.addLast(element);
+        }
         data.add(index, element);
     }
 
@@ -479,6 +486,13 @@ public class DynamicList<E> implements List<E>, ISeq<E> {
      */
     @Override
     public E remove(int index) {
+        if (type == SeqType.LINKEDLIST) {
+            LinkedList<E> ll = (LinkedList<E>) data;
+            if (index == 0)
+                return ll.removeFirst();
+            else if (index == size() - 1)
+                return ll.removeFirst();
+        }
         return data.remove(index);
     }
 

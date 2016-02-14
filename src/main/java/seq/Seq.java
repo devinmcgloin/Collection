@@ -26,30 +26,44 @@ import java.util.stream.Stream;
 public class Seq<E> implements Collection<E>, ISeq<E> {
 
     final boolean locked;
-    TYPE type;
+    SeqType type;
     DatedComparator<E> cmp = null;
     private ISeq<E> collection;
     private Recommender rec;
 
     public Seq() {
-        this(TYPE.SET, false);
+        this(SeqType.HASHSET, false);
     }
 
-    public Seq(TYPE type) {
+    public Seq(SeqType type) {
         this(type, false);
     }
 
-    public Seq(TYPE type, boolean locked) {
+    public Seq(SeqType type, boolean locked) {
         rec = new Recommender();
         switch (type) {
-            case SET:
-                collection = new DynamicSet<E>();
+            case TREESET:
+                collection = new DynamicSet<>(SeqType.TREESET);
+                type = SeqType.TREESET;
                 break;
-            case LIST:
-                collection = new DynamicList<E>();
+            case HASHSET:
+                collection = new DynamicSet<>(SeqType.HASHSET);
+                type = SeqType.HASHSET;
                 break;
-            case QUEUE:
-                collection = new DynamicQueue<E>();
+            case LINKEDLIST:
+                collection = new DynamicList<>(SeqType.LINKEDLIST);
+                type = SeqType.LINKEDLIST;
+                break;
+            case ARRAYLIST:
+                collection = new DynamicList<>(SeqType.ARRAYLIST);
+                type = SeqType.ARRAYLIST;
+                break;
+            case PRIORITYQUEUE:
+                type = SeqType.PRIORITYQUEUE;
+                if (cmp != null)
+                    collection = new DynamicQueue<>(cmp);
+                else
+                    collection = new DynamicQueue<>();
                 break;
         }
         this.locked = locked;
@@ -87,11 +101,11 @@ public class Seq<E> implements Collection<E>, ISeq<E> {
             }
         };
         this.cmp = cmp;
-        convert(TYPE.QUEUE);
+        convert(SeqType.PRIORITYQUEUE);
     }
 
     public void sort(DatedComparator<E> cmp) {
-        convert(TYPE.LIST);
+        convert(SeqType.ARRAYLIST);
         DynamicList<E> list = (DynamicList<E>) collection;
         list.sort(cmp);
         this.cmp = cmp;
@@ -127,24 +141,34 @@ public class Seq<E> implements Collection<E>, ISeq<E> {
         removeIf(predicate.negate());
     }
 
-    public void convert(TYPE t) {
+    public void convert(SeqType t) {
         if (locked || this.type == t)
             return;
         E[] arr;
         switch (t) {
-            case SET:
+            case TREESET:
                 arr = (E[]) toArray();
-                collection = new DynamicSet<>(arr);
-                type = TYPE.SET;
+                collection = new DynamicSet<>(arr, SeqType.TREESET);
+                type = SeqType.TREESET;
                 break;
-            case LIST:
+            case HASHSET:
                 arr = (E[]) toArray();
-                collection = new DynamicList<>(arr);
-                type = TYPE.LIST;
+                collection = new DynamicSet<>(arr, SeqType.HASHSET);
+                type = SeqType.HASHSET;
                 break;
-            case QUEUE:
+            case LINKEDLIST:
                 arr = (E[]) toArray();
-                type = TYPE.QUEUE;
+                collection = new DynamicList<>(arr, SeqType.LINKEDLIST);
+                type = SeqType.LINKEDLIST;
+                break;
+            case ARRAYLIST:
+                arr = (E[]) toArray();
+                collection = new DynamicList<>(arr, SeqType.ARRAYLIST);
+                type = SeqType.ARRAYLIST;
+                break;
+            case PRIORITYQUEUE:
+                arr = (E[]) toArray();
+                type = SeqType.PRIORITYQUEUE;
                 if (cmp != null)
                     collection = new DynamicQueue<>(cmp, arr);
                 else
@@ -727,9 +751,5 @@ public class Seq<E> implements Collection<E>, ISeq<E> {
             col.add(item);
         }
         return col;
-    }
-
-    public enum TYPE {
-        SET, LIST, QUEUE
     }
 }
