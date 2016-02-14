@@ -1,6 +1,8 @@
 package bench.udb;
 
-import datastructures.Seq;
+import funct.DatedComparator;
+import funct.Ranker;
+import seq.Seq;
 
 /**
  * @author devinmcgloin
@@ -8,18 +10,58 @@ import datastructures.Seq;
  */
 public class SeqDemo {
 
+    private static Seq<String> data;
+
     public static void main(String[] args) {
-        Seq<String> seq = new Seq<>();
-        genData(seq, 3, "");
+        Ranker<String> ranker = item -> {
+            double score = 0;
+            if (item.startsWith("0"))
+                score += 2;
+            if (item.endsWith("01"))
+                score += 3;
+            return score;
+        };
+
+        data = new Seq<>();
+
+        populate(3, "");
+        System.out.println(data);
+        data.filter(s -> s.startsWith("10"));
+        System.out.println(data);
+
+        populate(3, "");
+        data.search(ranker);
+        System.out.println(data);
+
+        data.sort(new DatedComparator<String>() {
+            @Override
+            public int compare(String o1, String o2) {
+                return (int) Math.floor(ranker.apply(o2) - ranker.apply(o1));
+            }
+        });
+        System.out.println(data);
+
+        data.filter(s -> s.startsWith("10"));
+        System.out.println(data);
+        populate(3, "");
+        System.out.println(data.contains("101"));
+        data.add("001");
+        System.out.println(data);
+        data.convert(Seq.TYPE.SET);
+        System.out.println(data);
+    }
+
+    private static void populate(int len, String primer) {
+        if (primer.length() == len)
+            data.add(primer);
+        else {
+            populate(len, primer + "0");
+            populate(len, primer + "1");
+        }
 
     }
 
-    private static void genData(Seq<String> set, int len, String seq) {
-        if (seq.length() == len)
-            set.add(seq);
-        else {
-            genData(set, len, seq + "0");
-            genData(set, len, seq + "1");
-        }
+    private static void randOps() {
+
     }
 }

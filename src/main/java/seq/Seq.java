@@ -1,5 +1,9 @@
-package datastructures;
+package seq;
 
+import datastructures.DynamicList;
+import datastructures.DynamicQueue;
+import datastructures.DynamicSet;
+import datastructures.ISeq;
 import funct.DatedComparator;
 import funct.Functor;
 import funct.Ranker;
@@ -55,22 +59,22 @@ public class Seq<E> implements Collection<E>, ISeq<E> {
     @Override
     public E get(final int i) {
         if (i == 0)
-            rec.inc(Recommender.SeqOp.FIRST);
+            rec.inc(SeqOp.FIRST);
         else if (i == size() - 1)
-            rec.inc(Recommender.SeqOp.LAST);
+            rec.inc(SeqOp.LAST);
         else
-            rec.inc(Recommender.SeqOp.MIDDLE);
+            rec.inc(SeqOp.MIDDLE);
         return collection.get(i);
     }
 
     @Override
     public E remove(final int i) {
         if (i == 0)
-            rec.inc(Recommender.SeqOp.FIRST);
+            rec.inc(SeqOp.FIRST);
         else if (i == size() - 1)
-            rec.inc(Recommender.SeqOp.LAST);
+            rec.inc(SeqOp.LAST);
         else
-            rec.inc(Recommender.SeqOp.MIDDLE);
+            rec.inc(SeqOp.MIDDLE);
         rec.decSize(1);
         return collection.remove(i);
     }
@@ -123,7 +127,7 @@ public class Seq<E> implements Collection<E>, ISeq<E> {
         removeIf(predicate.negate());
     }
 
-    private void convert(TYPE t) {
+    public void convert(TYPE t) {
         if (locked || this.type == t)
             return;
         E[] arr;
@@ -131,13 +135,16 @@ public class Seq<E> implements Collection<E>, ISeq<E> {
             case SET:
                 arr = (E[]) toArray();
                 collection = new DynamicSet<>(arr);
+                type = TYPE.SET;
                 break;
             case LIST:
                 arr = (E[]) toArray();
                 collection = new DynamicList<>(arr);
+                type = TYPE.LIST;
                 break;
             case QUEUE:
                 arr = (E[]) toArray();
+                type = TYPE.QUEUE;
                 if (cmp != null)
                     collection = new DynamicQueue<>(cmp, arr);
                 else
@@ -208,7 +215,7 @@ public class Seq<E> implements Collection<E>, ISeq<E> {
      */
     @Override
     public boolean contains(Object o) {
-        rec.inc(Recommender.SeqOp.MEMBERSHIP);
+        rec.inc(SeqOp.MEMBERSHIP);
         return collection.contains(o);
     }
 
@@ -378,7 +385,7 @@ public class Seq<E> implements Collection<E>, ISeq<E> {
      */
     @Override
     public boolean containsAll(Collection<?> c) {
-        rec.inc(Recommender.SeqOp.MEMBERSHIP);
+        rec.inc(SeqOp.MEMBERSHIP);
         return collection.containsAll(c);
     }
 

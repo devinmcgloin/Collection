@@ -1,5 +1,7 @@
 package datastructures;
 
+import seq.SeqType;
+
 import java.util.*;
 import java.util.function.Consumer;
 import java.util.function.Predicate;
@@ -12,15 +14,15 @@ import java.util.stream.Stream;
  */
 public class DynamicList<E> implements List<E>, ISeq<E> {
 
-    private LISTTYPE type;
+    private SeqType type;
     private List<E> data;
 
     public DynamicList() {
-        type = LISTTYPE.ARRAYLIST;
+        type = SeqType.ARRAYLIST;
         data = new ArrayList<E>();
     }
 
-    public DynamicList(LISTTYPE type) {
+    public DynamicList(SeqType type) {
         this.type = type;
         switch (type) {
             case ARRAYLIST:
@@ -38,7 +40,7 @@ public class DynamicList<E> implements List<E>, ISeq<E> {
             add(item);
     }
 
-    public DynamicList(E[] arr, LISTTYPE t) {
+    public DynamicList(E[] arr, SeqType t) {
         this(t);
         for (E item : arr)
             add(item);
@@ -52,7 +54,7 @@ public class DynamicList<E> implements List<E>, ISeq<E> {
                 '}';
     }
 
-    public void convert(LISTTYPE t) {
+    public void convert(SeqType t) {
         if (this.type == t) {
             return;
         }
@@ -767,9 +769,5 @@ public class DynamicList<E> implements List<E>, ISeq<E> {
     @Override
     public Stream<E> parallelStream() {
         return data.parallelStream();
-    }
-
-    public enum LISTTYPE {
-        ARRAYLIST, LINKEDLIST
     }
 }

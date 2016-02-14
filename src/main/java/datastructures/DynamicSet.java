@@ -1,5 +1,7 @@
 package datastructures;
 
+import seq.SeqType;
+
 import java.util.*;
 import java.util.function.Consumer;
 import java.util.function.Predicate;
@@ -10,15 +12,15 @@ import java.util.stream.Stream;
  */
 public class DynamicSet<E> implements Set<E>, ISeq<E> {
 
-    private SETTYPE type;
+    private SeqType type;
     private Set<E> data;
 
     public DynamicSet() {
-        type = SETTYPE.HASHSET;
+        type = SeqType.HASHSET;
         data = new HashSet<>();
     }
 
-    public DynamicSet(SETTYPE type) {
+    public DynamicSet(SeqType type) {
         this.type = type;
         switch (type) {
             case HASHSET:
@@ -36,7 +38,7 @@ public class DynamicSet<E> implements Set<E>, ISeq<E> {
             add(item);
     }
 
-    public DynamicSet(E[] arr, SETTYPE t) {
+    public DynamicSet(E[] arr, SeqType t) {
         this(t);
         for (E item : arr)
             add(item);
@@ -50,7 +52,7 @@ public class DynamicSet<E> implements Set<E>, ISeq<E> {
                 '}';
     }
 
-    public void convert(SETTYPE t) {
+    public void convert(SeqType t) {
         if (this.type == t) {
             return;
         }
@@ -531,9 +533,5 @@ public class DynamicSet<E> implements Set<E>, ISeq<E> {
     @Override
     public Stream<E> parallelStream() {
         return data.parallelStream();
-    }
-
-    public enum SETTYPE {
-        HASHSET, TREESET
     }
 }

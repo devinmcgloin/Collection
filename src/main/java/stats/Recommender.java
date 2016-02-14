@@ -1,7 +1,8 @@
 package stats;
 
 
-import datastructures.Seq;
+import seq.Seq;
+import seq.SeqOp;
 
 import java.util.EnumMap;
 
@@ -59,9 +60,6 @@ public class Recommender {
         return Seq.TYPE.SET;
     }
 
-    public enum SeqOp {
-        MEMBERSHIP, FIRST, MIDDLE, LAST, SIZE
-    }
 
 
 
